@@ -2,6 +2,7 @@ import { SearchX } from 'lucide-react'
 import { useState } from 'react'
 
 import { Container } from '@/components/layout/Container'
+import { Reveal } from '@/components/motion/Reveal'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Chip } from '@/components/ui/Chip'
@@ -35,7 +36,7 @@ export default function KitchenSink() {
         <p className="text-sm leading-relaxed text-muted">{t('kitchenSink.subtitle')}</p>
       </header>
 
-      <section className="flex flex-col gap-4">
+      <Reveal as="section" delay={0} className="flex flex-col gap-4">
         <h2 className="font-body text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.buttons')}</h2>
         <div className="flex flex-wrap items-center gap-3">
           <Button variant="primary">{t('common.confirm')}</Button>
@@ -50,9 +51,9 @@ export default function KitchenSink() {
           <Button size="md">{t('common.confirm')}</Button>
           <Button size="lg">{t('common.confirm')}</Button>
         </div>
-      </section>
+      </Reveal>
 
-      <section className="flex flex-col gap-5">
+      <Reveal as="section" delay={80} className="flex flex-col gap-5">
         <h2 className="font-body text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.forms')}</h2>
         <div className="grid gap-5 sm:grid-cols-2">
           <Input label={t('kitchenSink.sampleLabel')} hint={t('kitchenSink.sampleHint')} />
@@ -67,9 +68,9 @@ export default function KitchenSink() {
           />
           <Textarea label={t('kitchenSink.sampleMessage')} />
         </div>
-      </section>
+      </Reveal>
 
-      <section className="flex flex-col gap-4">
+      <Reveal as="section" delay={160} className="flex flex-col gap-4">
         <h2 className="font-body text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.feedback')}</h2>
         <div className="flex flex-wrap items-center gap-3">
           <Badge>{t('common.loading')}</Badge>
@@ -110,9 +111,9 @@ export default function KitchenSink() {
             {t('kitchenSink.showToast')}
           </Button>
         </div>
-      </section>
+      </Reveal>
 
-      <section className="flex flex-col gap-4">
+      <Reveal as="section" delay={240} className="flex flex-col gap-4">
         <h2 className="font-body text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.states')}</h2>
         <div className="flex flex-col gap-2">
           <Skeleton className="h-6 w-48" />
@@ -126,7 +127,7 @@ export default function KitchenSink() {
           action={<Button size="sm">{t('common.clearFilters')}</Button>}
           className="max-w-md"
         />
-      </section>
+      </Reveal>
 
       <Modal
         open={modalOpen}

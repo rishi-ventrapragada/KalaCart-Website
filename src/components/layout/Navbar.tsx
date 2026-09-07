@@ -40,6 +40,13 @@ export function Navbar() {
           </div>
 
           <div className="ml-auto flex items-center gap-2">
+            {/*
+              A navigation affordance, not a form control: it links to Browse,
+              where PRD 11.3 puts the real search in the URL. Deliberately not
+              the Input primitive, which would need a submit target that does
+              not exist until Increment 9. Border is line-strong (3.13:1 light,
+              3.37:1 dark), the functional-boundary token.
+            */}
             <Link
               to="/browse"
               aria-label={t('common.search')}
@@ -49,11 +56,23 @@ export function Navbar() {
               <span>{t('nav.searchPlaceholder')}</span>
             </Link>
 
-            <NavLink to="/admin" className={cn(linkClasses({ isActive: false }), 'hidden sm:block')}>
+            <ThemeToggle />
+
+            {/*
+              Discreet per PRD 11.0: demoted by scale and position, not by
+              colour. Dimming it further would drop it under AA, which the
+              Increment 5 contrast pass just resolved. It trails the toggle as a
+              utility rather than sitting beside Browse as a peer.
+            */}
+            <NavLink
+              to="/admin"
+              className={cn(
+                'hidden text-xs tracking-[-0.005em] text-muted',
+                'transition-colors duration-200 ease-site hover:text-ink sm:block',
+              )}
+            >
               {t('nav.admin')}
             </NavLink>
-
-            <ThemeToggle />
 
             <button
               type="button"
