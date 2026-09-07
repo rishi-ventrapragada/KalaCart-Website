@@ -11,10 +11,7 @@ interface ThemeToggleProps {
 /**
  * Switches between the two palettes.
  *
- * PRD 11.0 puts this in the nav; the Navbar arrives in Increment 4, so for now
- * AppShell mounts it directly and it moves in then.
- *
- * Capsule shape per the PRD 9.5 shape binary.
+ * Lives in the Navbar per PRD 11.0. Capsule shape per the PRD 9.5 shape binary.
  */
 export function ThemeToggle({ className }: ThemeToggleProps) {
   const { theme, toggle } = useTheme()
