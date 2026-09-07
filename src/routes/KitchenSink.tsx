@@ -36,7 +36,7 @@ export default function KitchenSink() {
       </header>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.buttons')}</h2>
+        <h2 className="font-body text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.buttons')}</h2>
         <div className="flex flex-wrap items-center gap-3">
           <Button variant="primary">{t('common.confirm')}</Button>
           <Button variant="secondary">{t('common.cancel')}</Button>
@@ -53,7 +53,7 @@ export default function KitchenSink() {
       </section>
 
       <section className="flex flex-col gap-5">
-        <h2 className="text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.forms')}</h2>
+        <h2 className="font-body text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.forms')}</h2>
         <div className="grid gap-5 sm:grid-cols-2">
           <Input label={t('kitchenSink.sampleLabel')} hint={t('kitchenSink.sampleHint')} />
           <Input label={t('kitchenSink.sampleLabel')} error={t('kitchenSink.sampleError')} />
@@ -70,7 +70,7 @@ export default function KitchenSink() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.feedback')}</h2>
+        <h2 className="font-body text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.feedback')}</h2>
         <div className="flex flex-wrap items-center gap-3">
           <Badge>{t('common.loading')}</Badge>
           <Badge tone="positive">{t('common.confirm')}</Badge>
@@ -113,7 +113,7 @@ export default function KitchenSink() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.states')}</h2>
+        <h2 className="font-body text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.states')}</h2>
         <div className="flex flex-col gap-2">
           <Skeleton className="h-6 w-48" />
           <Skeleton className="h-6 w-72" />

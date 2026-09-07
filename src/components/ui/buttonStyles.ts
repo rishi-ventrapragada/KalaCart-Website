@@ -18,7 +18,11 @@ export const buttonBase =
   // Colour-only transition on the one easing curve (PRD 9.7). Never
   // `transition: all`, and never animating geometry.
   'transition-[background-color,border-color,color] duration-200 ease-site ' +
-  'disabled:cursor-not-allowed disabled:opacity-45'
+  // Disabled drops the fill rather than dimming it. Dimming a filled capsule
+  // leaves a muddy mid-tone with a low-contrast label on it; a flat outline
+  // reads as unavailable and keeps the word legible.
+  'disabled:cursor-not-allowed disabled:border disabled:border-line ' +
+  'disabled:bg-transparent disabled:text-muted disabled:shadow-none'
 
 export const buttonVariants: Record<ButtonVariant, string> = {
   // NOTE: a solid accent fill brushes against the PRD 9.6 accent rule, which
