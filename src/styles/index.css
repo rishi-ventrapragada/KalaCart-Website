@@ -1,18 +1,74 @@
 @import 'tailwindcss';
 
-/* Theme tokens land here in Increment 1. The shape is deliberate:
-   raw values live as plain custom properties on :root and [data-theme='dark'],
-   and `@theme inline` only ALIASES them, so utilities emit var(--token) and
-   resolve at runtime. Without `inline`, Tailwind would bake one palette in at
-   build time and the data-theme swap would not work. */
+/**
+ * THE THEME SEAM (PRD 7.1).
+ *
+ * Raw palette values are plain custom properties: light on :root, dark
+ * overriding them under [data-theme='dark']. `@theme inline` then only ALIASES
+ * them, so a utility like bg-canvas compiles to `background: var(--canvas)`
+ * and resolves at runtime. Without `inline`, Tailwind would inline the value at
+ * build time and the data-theme swap would do nothing.
+ *
+ * Hex lives here and in src/app/theme.ts. Never in a component.
+ */
 
 :root {
+  color-scheme: light;
+
+  /* Light "Raw Cotton" (PRD 9.1). */
+  --canvas: #f5f0e6;
+  --card: #ffffff;
+  --ink: #241e1a;
+  --muted: #6f6559;
+  --line: #e3d9c6;
+  --line-strong: #d6c9b0;
+  --accent: #2e4374;
+  --accent-deep: #1b2a4a;
+  --secondary: #b8862f;
+
   /* The one easing curve for every transition on the site (PRD 9.7). */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Shape binary (PRD 9.5): controls are capsules, containers are soft rects. */
+  --radius-control: 999px;
+  --radius-card: 22px;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Dark "Gallery Wall" (PRD 9.2). */
+  --canvas: #17130f;
+  --card: #201a15;
+  --ink: #f3ece0;
+  --muted: #a79a88;
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.14);
+  --accent: #c9922b;
+  --accent-deep: #a8761f;
+  --secondary: #a63a3a;
 }
 
 @theme inline {
+  --color-canvas: var(--canvas);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-deep: var(--accent-deep);
+  --color-secondary: var(--secondary);
+
+  /* Category dye tones (PRD 9.3), theme-independent. */
+  --color-indigo: #2e4374;
+  --color-madder: #a63a3a;
+  --color-marigold: #c9922b;
+  --color-brass: #b8862f;
+
   --ease-site: var(--ease);
+  --radius-control: var(--radius-control);
+  --radius-card: var(--radius-card);
 }
 
 html {
@@ -23,4 +79,22 @@ html {
 body {
   margin: 0;
   min-height: 100dvh;
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+/* Visible keyboard focus everywhere (CLAUDE.md law 7). */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
