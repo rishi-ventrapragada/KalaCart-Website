@@ -1,6 +1,7 @@
 import { Moon, Sun } from 'lucide-react'
 
 import { useTheme } from '@/app/useTheme'
+import { useT } from '@/lib/i18n'
 import { cn } from '@/lib/utils/cn'
 
 interface ThemeToggleProps {
@@ -13,18 +14,18 @@ interface ThemeToggleProps {
  * PRD 11.0 puts this in the nav; the Navbar arrives in Increment 4, so for now
  * AppShell mounts it directly and it moves in then.
  *
- * Capsule shape per the PRD 9.5 shape binary. Copy is hardcoded until the i18n
- * seam lands in Increment 3, which will replace the label with a key.
+ * Capsule shape per the PRD 9.5 shape binary.
  */
 export function ThemeToggle({ className }: ThemeToggleProps) {
   const { theme, toggle } = useTheme()
+  const t = useT()
   const isDark = theme === 'dark'
 
   return (
     <button
       type="button"
       onClick={toggle}
-      aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+      aria-label={isDark ? t('theme.toLight') : t('theme.toDark')}
       aria-pressed={isDark}
       className={cn(
         'inline-flex h-10 w-10 items-center justify-center rounded-control',

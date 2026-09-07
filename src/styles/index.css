@@ -32,6 +32,16 @@
   /* Shape binary (PRD 9.5): controls are capsules, containers are soft rects. */
   --radius-control: 999px;
   --radius-card: 22px;
+
+  /*
+   * Type stacks (PRD 9.4). Fraunces and Hanken Grotesk land with the Increment 5
+   * design pass and slot into the front of these stacks; Mukta sits behind them
+   * as the Devanagari-capable fallback required by PRD 7.4, so a later language
+   * switch degrades to a face that can actually render the script.
+   */
+  --font-display: ui-serif, Georgia, 'Mukta', serif;
+  --font-body:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Mukta', sans-serif;
 }
 
 [data-theme='dark'] {
@@ -69,6 +79,9 @@
   --ease-site: var(--ease);
   --radius-control: var(--radius-control);
   --radius-card: var(--radius-card);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
 }
 
 html {
@@ -81,6 +94,13 @@ body {
   min-height: 100dvh;
   background: var(--canvas);
   color: var(--ink);
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
 }
 
 /* Visible keyboard focus everywhere (CLAUDE.md law 7). */
