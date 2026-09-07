@@ -1,0 +1,105 @@
+import type { Artisan } from '@/lib/data/types'
+import { img } from '@/lib/data/mock/images'
+
+/**
+ * Nine artisans across six crafts, with real craft-region pairings. The status
+ * mix is deliberate: five approved so buyer surfaces have content, three
+ * pending so the admin queue has real work, one rejected so the queue's
+ * outcomes are visible in analytics.
+ *
+ * Profiles are intentionally minimal per PRD section 8 - name, craft, region,
+ * no long bio.
+ */
+
+export const artisans: Artisan[] = [
+  {
+    id: 'a1',
+    name: 'Hansaben Vankar',
+    categoryId: 'c1',
+    region: 'Kutch, Gujarat',
+    photoUrl: img('artisan-a1', 1),
+    phone: '+919876543201',
+    status: 'approved',
+    createdAt: '2024-08-14T09:20:00.000Z',
+  },
+  {
+    id: 'a2',
+    name: 'Ram Prasad Sharma',
+    categoryId: 'c2',
+    region: 'Jaipur, Rajasthan',
+    photoUrl: img('artisan-a2', 1),
+    phone: '+919876543202',
+    status: 'approved',
+    createdAt: '2024-09-02T11:45:00.000Z',
+  },
+  {
+    id: 'a3',
+    name: 'Sunita Devi',
+    categoryId: 'c3',
+    region: 'Madhubani, Bihar',
+    photoUrl: img('artisan-a3', 1),
+    phone: '+919876543203',
+    status: 'approved',
+    createdAt: '2024-10-19T15:05:00.000Z',
+  },
+  {
+    id: 'a4',
+    name: 'Budhram Baghel',
+    categoryId: 'c4',
+    region: 'Bastar, Chhattisgarh',
+    photoUrl: img('artisan-a4', 1),
+    phone: '+919876543204',
+    status: 'approved',
+    createdAt: '2024-11-27T08:30:00.000Z',
+  },
+  {
+    id: 'a5',
+    name: 'Mohammed Yusuf Chhipa',
+    categoryId: 'c5',
+    region: 'Bagru, Rajasthan',
+    photoUrl: img('artisan-a5', 1),
+    phone: '+919876543205',
+    status: 'approved',
+    createdAt: '2025-01-16T13:10:00.000Z',
+  },
+  {
+    id: 'a6',
+    name: 'Lakshmi Ammal',
+    categoryId: 'c1',
+    region: 'Kancheepuram, Tamil Nadu',
+    photoUrl: img('artisan-a6', 1),
+    phone: '+919876543206',
+    status: 'pending',
+    createdAt: '2025-04-08T10:00:00.000Z',
+  },
+  {
+    id: 'a7',
+    name: 'Bhaskar Chitrakar',
+    categoryId: 'c3',
+    region: 'Bishnupur, West Bengal',
+    photoUrl: img('artisan-a7', 1),
+    phone: '+919876543207',
+    status: 'pending',
+    createdAt: '2025-05-21T16:40:00.000Z',
+  },
+  {
+    id: 'a8',
+    name: 'Nayan Hazarika',
+    categoryId: 'c6',
+    region: 'Majuli, Assam',
+    photoUrl: img('artisan-a8', 1),
+    phone: '+919876543208',
+    status: 'pending',
+    createdAt: '2025-06-30T12:15:00.000Z',
+  },
+  {
+    id: 'a9',
+    name: 'Syed Ghani Khan',
+    categoryId: 'c4',
+    region: 'Channapatna, Karnataka',
+    photoUrl: img('artisan-a9', 1),
+    phone: '+919876543209',
+    status: 'rejected',
+    createdAt: '2025-02-11T09:55:00.000Z',
+  },
+]
