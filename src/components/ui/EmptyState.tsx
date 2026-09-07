@@ -20,14 +20,14 @@ export function EmptyState({ icon: Icon, title, body, action, className }: Empty
   return (
     <div
       className={cn(
-        'flex flex-col items-center gap-3 rounded-card border border-line bg-card px-6 py-10 text-center',
+        'flex flex-col items-center gap-3 rounded-card border border-line bg-card px-8 py-12 text-center',
         className,
       )}
     >
       {Icon ? <Icon size={22} aria-hidden className="text-muted" /> : null}
-      <h3 className="text-base font-medium text-ink">{title}</h3>
-      {body ? <p className="max-w-sm text-sm text-muted">{body}</p> : null}
-      {action ? <div className="mt-1">{action}</div> : null}
+      <h3 className="text-lg text-ink">{title}</h3>
+      {body ? <p className="max-w-xs text-sm leading-relaxed text-muted">{body}</p> : null}
+      {action ? <div className="mt-2">{action}</div> : null}
     </div>
   )
 }

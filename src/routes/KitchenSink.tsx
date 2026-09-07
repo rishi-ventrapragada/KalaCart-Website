@@ -29,14 +29,14 @@ export default function KitchenSink() {
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   return (
-    <Container className="flex flex-col gap-10 py-10">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold">{t('kitchenSink.title')}</h1>
-        <p className="text-sm text-muted">{t('kitchenSink.subtitle')}</p>
+    <Container className="flex flex-col gap-14 py-16">
+      <header className="flex flex-col gap-2">
+        <h1 className="text-3xl">{t('kitchenSink.title')}</h1>
+        <p className="text-sm leading-relaxed text-muted">{t('kitchenSink.subtitle')}</p>
       </header>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-medium text-muted">{t('kitchenSink.buttons')}</h2>
+      <section className="flex flex-col gap-4">
+        <h2 className="text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.buttons')}</h2>
         <div className="flex flex-wrap items-center gap-3">
           <Button variant="primary">{t('common.confirm')}</Button>
           <Button variant="secondary">{t('common.cancel')}</Button>
@@ -52,9 +52,9 @@ export default function KitchenSink() {
         </div>
       </section>
 
-      <section className="flex flex-col gap-4">
-        <h2 className="text-sm font-medium text-muted">{t('kitchenSink.forms')}</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
+      <section className="flex flex-col gap-5">
+        <h2 className="text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.forms')}</h2>
+        <div className="grid gap-5 sm:grid-cols-2">
           <Input label={t('kitchenSink.sampleLabel')} hint={t('kitchenSink.sampleHint')} />
           <Input label={t('kitchenSink.sampleLabel')} error={t('kitchenSink.sampleError')} />
           <Select
@@ -69,8 +69,8 @@ export default function KitchenSink() {
         </div>
       </section>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-medium text-muted">{t('kitchenSink.feedback')}</h2>
+      <section className="flex flex-col gap-4">
+        <h2 className="text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.feedback')}</h2>
         <div className="flex flex-wrap items-center gap-3">
           <Badge>{t('common.loading')}</Badge>
           <Badge tone="positive">{t('common.confirm')}</Badge>
@@ -112,8 +112,8 @@ export default function KitchenSink() {
         </div>
       </section>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-medium text-muted">{t('kitchenSink.states')}</h2>
+      <section className="flex flex-col gap-4">
+        <h2 className="text-xs font-medium tracking-[0.02em] text-muted">{t('kitchenSink.states')}</h2>
         <div className="flex flex-col gap-2">
           <Skeleton className="h-6 w-48" />
           <Skeleton className="h-6 w-72" />

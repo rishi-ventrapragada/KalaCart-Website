@@ -21,7 +21,7 @@
   --ink: #241e1a;
   --muted: #6f6559;
   --line: #e3d9c6;
-  --line-strong: #d6c9b0;
+  --line-strong: #9c8555;
   --accent: #2e4374;
   --accent-deep: #1b2a4a;
   --secondary: #b8862f;
@@ -39,9 +39,30 @@
    * as the Devanagari-capable fallback required by PRD 7.4, so a later language
    * switch degrades to a face that can actually render the script.
    */
-  --font-display: ui-serif, Georgia, 'Mukta', serif;
+  --font-display: 'Fraunces', ui-serif, Georgia, 'Mukta', serif;
   --font-body:
-    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Mukta', sans-serif;
+    'Hanken Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'Mukta',
+    sans-serif;
+
+  /*
+   * Type scale, 1.25 minor third off a 16px body. Editorial rather than
+   * dramatic: PRD 9.4 asks for calm and confident, and a wider ratio would
+   * shout. Display sizes carry tight tracking; small text opens up slightly so
+   * it stays legible at weight.
+   */
+  --text-2xs: 0.694rem;
+  --text-xs: 0.8rem;
+  --text-sm: 0.9rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.563rem;
+  --text-2xl: 1.953rem;
+  --text-3xl: 2.441rem;
+  --text-4xl: 3.052rem;
+
+  /* Spacing rhythm on a 4px base. Sections breathe; controls stay compact. */
+  --space-section: 5rem;
+  --space-block: 2.5rem;
 }
 
 [data-theme='dark'] {
@@ -53,7 +74,7 @@
   --ink: #f3ece0;
   --muted: #a79a88;
   --line: rgba(255, 255, 255, 0.1);
-  --line-strong: rgba(255, 255, 255, 0.14);
+  --line-strong: rgba(255, 255, 255, 0.36);
   --accent: #c9922b;
   --accent-deep: #a8761f;
   --secondary: #a63a3a;
@@ -82,6 +103,16 @@
 
   --font-display: var(--font-display);
   --font-body: var(--font-body);
+
+  --text-2xs: var(--text-2xs);
+  --text-xs: var(--text-xs);
+  --text-sm: var(--text-sm);
+  --text-base: var(--text-base);
+  --text-lg: var(--text-lg);
+  --text-xl: var(--text-xl);
+  --text-2xl: var(--text-2xl);
+  --text-3xl: var(--text-3xl);
+  --text-4xl: var(--text-4xl);
 }
 
 html {
@@ -95,12 +126,34 @@ body {
   background: var(--canvas);
   color: var(--ink);
   font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
+/*
+ * Fraunces carries the display voice. Weight and a little optical wonk rather
+ * than thin high-contrast strokes: a sturdy, printerly serif reads as woodblock
+ * and hand-cut type, which is the subject matter, and sidesteps the thin-serif
+ * craft-page cliche CLAUDE.md calls out.
+ */
 h1,
 h2,
-h3 {
+h3,
+h4 {
   font-family: var(--font-display);
+  font-variation-settings:
+    'SOFT' 30,
+    'WONK' 1;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* Copy stays comfortable to read; measure is capped where it matters. */
+p {
+  text-wrap: pretty;
 }
 
 /* Toast entrance. Uses the one easing curve (PRD 9.7) and is applied through a

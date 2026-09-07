@@ -26,9 +26,9 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       aria-pressed={isDark}
       className={cn(
         'inline-flex h-10 w-10 items-center justify-center rounded-control',
-        'border border-line bg-card text-muted',
-        'transition-colors duration-200 ease-site',
-        'hover:text-ink hover:border-line-strong',
+        'border border-line-strong bg-card text-muted',
+        'transition-[border-color,color] duration-200 ease-site',
+        'hover:border-accent hover:text-ink',
         className,
       )}
     >

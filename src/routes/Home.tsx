@@ -10,9 +10,9 @@ export default function Home() {
   const t = useT()
 
   return (
-    <Container className="flex flex-col items-center gap-5 py-24 text-center">
-      <h1 className="text-4xl font-semibold tracking-tight">{t('home.hero.title')}</h1>
-      <p className="max-w-sm text-sm text-muted">{t('home.hero.subtitle')}</p>
+    <Container className="flex flex-col items-center gap-6 py-28 text-center">
+      <h1 className="text-4xl">{t('home.hero.title')}</h1>
+      <p className="max-w-sm text-lg leading-relaxed text-muted">{t('home.hero.subtitle')}</p>
       <Link
         to="/browse"
         className={cn(buttonBase, buttonVariants.primary, buttonSizes.md)}

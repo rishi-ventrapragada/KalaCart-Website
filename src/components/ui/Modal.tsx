@@ -46,25 +46,26 @@ export function Modal({ open, onClose, title, children, footer, className }: Mod
         aria-labelledby={titleId}
         tabIndex={-1}
         className={cn(
-          'relative z-10 w-full max-w-md rounded-card border border-line bg-card p-5 shadow-lg',
+          'relative z-10 w-full max-w-md rounded-card border border-line-strong bg-card p-6',
+          'shadow-[0_16px_48px_-12px_rgb(0_0_0_/_0.45)]',
           className,
         )}
       >
-        <div className="mb-3 flex items-start justify-between gap-4">
-          <h2 id={titleId} className="text-lg font-semibold text-ink">
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <h2 id={titleId} className="text-xl text-ink">
             {title}
           </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label={t('common.close')}
-            className="rounded-control p-1 text-muted transition-colors duration-200 ease-site hover:text-ink"
+            className="-mt-1 rounded-control p-1.5 text-muted transition-colors duration-200 ease-site hover:text-ink"
           >
             <X size={18} aria-hidden />
           </button>
         </div>
-        <div className="text-sm text-muted">{children}</div>
-        {footer ? <div className="mt-5 flex justify-end gap-2">{footer}</div> : null}
+        <div className="text-sm leading-relaxed text-muted">{children}</div>
+        {footer ? <div className="mt-6 flex justify-end gap-2">{footer}</div> : null}
       </div>
     </div>
   )

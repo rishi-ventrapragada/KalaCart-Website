@@ -24,7 +24,8 @@ export function Toast({ message, tone, onDismiss }: ToastProps) {
     <div
       role="status"
       className={cn(
-        'flex items-start gap-3 rounded-card border bg-card px-4 py-3 text-sm text-ink shadow-lg',
+        'flex items-start gap-3 rounded-card border bg-card px-4 py-3.5 text-sm text-ink',
+        'shadow-[0_8px_24px_-8px_rgb(0_0_0_/_0.35)]',
         'motion-safe:animate-toast-in',
         tones[tone],
       )}

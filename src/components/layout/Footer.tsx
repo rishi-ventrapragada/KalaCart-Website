@@ -8,16 +8,16 @@ export function Footer() {
   const t = useT()
 
   return (
-    <footer className="mt-auto border-t border-line bg-canvas py-10">
+    <footer className="mt-auto border-t border-line bg-canvas py-14">
       <Container>
         <div className="flex flex-col gap-8 sm:flex-row sm:justify-between">
           <div className="max-w-sm">
-            <p className="text-base font-semibold text-ink">{t('brand.name')}</p>
-            <p className="mt-2 text-sm text-muted">{t('footer.programLine')}</p>
+            <p className="font-display text-lg text-ink">{t('brand.name')}</p>
+            <p className="mt-3 text-sm leading-relaxed text-muted">{t('footer.programLine')}</p>
           </div>
 
           <nav aria-label={t('footer.exploreHeading')} className="flex flex-col gap-2">
-            <p className="text-xs font-medium tracking-wide text-ink">
+            <p className="text-xs font-medium text-ink">
               {t('footer.exploreHeading')}
             </p>
             <Link to="/" className="text-sm text-muted transition-colors duration-200 ease-site hover:text-ink">
@@ -29,9 +29,9 @@ export function Footer() {
           </nav>
         </div>
 
-        <div className="mt-8 border-t border-line pt-6">
+        <div className="mt-12 border-t border-line pt-6">
           <p className="text-xs text-muted">{t('footer.credit')}</p>
-          <p className="mt-1 text-xs text-muted">{t('footer.ministry')}</p>
+          <p className="mt-1.5 text-xs text-muted">{t('footer.ministry')}</p>
         </div>
       </Container>
     </footer>

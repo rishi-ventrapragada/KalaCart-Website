@@ -9,8 +9,8 @@ export default function ProductDetail() {
   const t = useT()
 
   return (
-    <Container className="py-16">
-      <h1 className="text-2xl font-semibold">
+    <Container className="py-20">
+      <h1 className="text-3xl">
         {t('product.detailTitle', { id: id ?? '' })}
       </h1>
     </Container>

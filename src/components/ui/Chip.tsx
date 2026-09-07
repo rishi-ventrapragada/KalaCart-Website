@@ -12,19 +12,26 @@ interface ChipProps {
   className?: string
 }
 
-/** The dot is the one place category colour appears (PRD 9.3, 9.6). */
-const dyeDots: Record<DyeName, string> = {
+/** The mark is the one place category colour appears (PRD 9.3, 9.6). */
+const dyeMarks: Record<DyeName, string> = {
   indigo: 'bg-indigo',
   madder: 'bg-madder',
   marigold: 'bg-marigold',
   brass: 'bg-brass',
 }
 
-/** Capsule per the PRD 9.5 shape binary. */
+/**
+ * Capsule per the PRD 9.5 shape binary.
+ *
+ * THE SIGNATURE ELEMENT. The category mark is a short warp thread rather than a
+ * dot: a 2px stroke the height of the cap, the way a woven selvedge reads. It
+ * is the one place this component set is grounded in the craft rather than in
+ * generic UI, so everything around it stays quiet.
+ */
 export function Chip({ dye, selected = false, onClick, children, className }: ChipProps) {
   const classes = cn(
-    'inline-flex items-center gap-2 rounded-control border px-3 py-1 text-sm',
-    'transition-colors duration-200 ease-site',
+    'inline-flex items-center gap-2.5 rounded-control border px-3.5 py-1.5 text-sm',
+    'transition-[border-color,color] duration-200 ease-site',
     selected ? 'border-accent text-ink' : 'border-line text-muted',
     onClick && 'hover:border-line-strong hover:text-ink',
     className,
@@ -32,7 +39,9 @@ export function Chip({ dye, selected = false, onClick, children, className }: Ch
 
   const content = (
     <>
-      {dye ? <span aria-hidden className={cn('size-1.5 rounded-control', dyeDots[dye])} /> : null}
+      {dye ? (
+        <span aria-hidden className={cn('h-3 w-0.5 rounded-full', dyeMarks[dye])} />
+      ) : null}
       {children}
     </>
   )

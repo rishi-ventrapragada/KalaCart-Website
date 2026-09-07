@@ -9,7 +9,7 @@ export default function NotFound() {
 
   return (
     <Container className="flex flex-col items-center gap-4 py-24 text-center">
-      <h1 className="text-2xl font-semibold">{t('notFound.title')}</h1>
+      <h1 className="text-3xl">{t('notFound.title')}</h1>
       <div className="flex gap-4 text-sm text-accent">
         <Link to="/">{t('nav.home')}</Link>
         <Link to="/browse">{t('nav.browse')}</Link>

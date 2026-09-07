@@ -9,8 +9,8 @@ export default function ArtisanProfile() {
   const t = useT()
 
   return (
-    <Container className="py-16">
-      <h1 className="text-2xl font-semibold">
+    <Container className="py-20">
+      <h1 className="text-3xl">
         {t('artisan.profileTitle', { id: id ?? '' })}
       </h1>
     </Container>

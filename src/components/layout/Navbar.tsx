@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils/cn'
 
 const linkClasses = ({ isActive }: { isActive: boolean }): string =>
   cn(
-    'text-sm transition-colors duration-200 ease-site',
+    'text-sm tracking-[-0.005em] transition-colors duration-200 ease-site',
     isActive ? 'text-ink' : 'text-muted hover:text-ink',
   )
 
@@ -28,8 +28,8 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-canvas">
       <Container>
-        <nav aria-label={t('nav.primary')} className="flex h-16 items-center gap-4">
-          <Link to="/" className="text-lg font-semibold tracking-tight text-ink">
+        <nav aria-label={t('nav.primary')} className="flex h-[4.5rem] items-center gap-6">
+          <Link to="/" className="font-display text-xl tracking-[-0.02em] text-ink">
             {t('brand.name')}
           </Link>
 
@@ -43,7 +43,7 @@ export function Navbar() {
             <Link
               to="/browse"
               aria-label={t('common.search')}
-              className="hidden items-center gap-2 rounded-control border border-line px-3 py-2 text-sm text-muted transition-colors duration-200 ease-site hover:border-line-strong hover:text-ink sm:flex"
+              className="hidden items-center gap-2 rounded-control border border-line-strong px-3.5 py-2 text-sm text-muted transition-[border-color,color] duration-200 ease-site hover:border-accent hover:text-ink sm:flex"
             >
               <Search size={15} aria-hidden />
               <span>{t('nav.searchPlaceholder')}</span>
@@ -62,7 +62,7 @@ export function Navbar() {
               }}
               aria-label={t('nav.openMenu')}
               aria-expanded={menuOpen}
-              className="rounded-control border border-line p-2 text-muted transition-colors duration-200 ease-site hover:text-ink sm:hidden"
+              className="rounded-control border border-line-strong p-2 text-muted transition-[border-color,color] duration-200 ease-site hover:border-accent hover:text-ink sm:hidden"
             >
               <Menu size={18} aria-hidden />
             </button>

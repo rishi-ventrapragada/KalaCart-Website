@@ -253,35 +253,57 @@ Mock data should ship at least 8 artisans across 5+ categories and about 30 prod
 ## 9. Design system
 
 ### 9.1 Theme A — Light "Raw Cotton" (cool brand on warm neutral)
-| Token | Hex |
-|---|---|
-| canvas | `#F5F0E6` |
-| card | `#FFFFFF` |
-| ink (text) | `#241E1A` |
-| muted | `#6F6559` |
-| line (border) | `#E3D9C6` |
-| brand (indigo) | `#2E4374` |
-| brand-deep | `#1B2A4A` |
-| highlight (brass) | `#B8862F` |
+| Token | Hex | Role |
+|---|---|---|
+| canvas | `#F5F0E6` | page background |
+| card | `#FFFFFF` | raised surfaces |
+| ink (text) | `#241E1A` | primary text |
+| muted | `#6F6559` | secondary text |
+| line | `#E3D9C6` | decorative dividers only |
+| line-strong | `#9C8555` | functional boundaries — **resolved Increment 5** |
+| brand / accent (indigo) | `#2E4374` | the single accent |
+| brand-deep / accent-deep | `#1B2A4A` | accent hover and pressed |
+| highlight / secondary (brass) | `#B8862F` | non-text only — **resolved Increment 5** |
 
 ### 9.2 Theme B — Dark "Gallery Wall" (warm metallic on warm charcoal)
-| Token | Hex |
-|---|---|
-| canvas | `#17130F` |
-| card | `#201A15` |
-| text | `#F3ECE0` |
-| muted | `#A79A88` |
-| line (border) | `rgba(255,255,255,.10)`, stronger edges `rgba(255,255,255,.14)` |
-| accent (marigold/brass) | `#C9922B` |
-| secondary (madder) | `#A63A3A` |
+| Token | Hex | Role |
+|---|---|---|
+| canvas | `#17130F` | page background |
+| card | `#201A15` | raised surfaces |
+| ink (text) | `#F3ECE0` | primary text |
+| muted | `#A79A88` | secondary text |
+| line | `rgba(255,255,255,.10)` | decorative dividers only |
+| line-strong | `rgba(255,255,255,.36)` | functional boundaries — **resolved Increment 5** |
+| accent (marigold/brass) | `#C9922B` | the single accent |
+| accent-deep | `#A8761F` | accent hover and pressed — **resolved Increment 1** |
+| secondary (madder) | `#A63A3A` | non-text only — **resolved Increment 5** |
 
 Light leans cool and brand-led with indigo as the single accent; dark leans warm and gallery-lit with brass as the single accent. That difference in accent logic is intentional.
+
+Both palettes use one canonical token set so a single semantic class is correct in either theme. The §9.1 names (`ink`, `brand`, `highlight`) and the §9.2 names (`text`, `accent`, `secondary`) describe the same roles; the code uses `ink` / `accent` / `secondary` throughout, and `accent` therefore means indigo in light and brass in dark by design.
+
+### 9.2a Accessibility floor (resolved Increment 5)
+
+Every token pair that renders as text or as a UI boundary was measured against WCAG AA in both themes. Three failures found in Increment 4 are resolved as follows, and the values above reflect the fixes:
+
+1. **`secondary` is never a text or label colour.** Brass (`#B8862F`) and madder (`#A63A3A`) are both mid-tone and fail AA against light and dark surfaces alike (3.24:1 and 2.69:1 on card). Error copy and destructive-button labels use `ink` instead, which measures 5.09:1 on brass and 5.44:1 on madder. `secondary` survives on borders, dye marks and chips — the non-text uses it was always intended for.
+2. **Borders come in two tiers.** `line` keeps §9.2's soft value for decorative dividers, where no contrast floor applies. `line-strong` is the functional boundary for inputs, interactive cards and focus targets, and clears the 3:1 that AA requires of UI components against **both** canvas and card: light `#9C8555` at 3.13:1 / 3.56:1, dark `rgba(255,255,255,.36)` at 3.33:1 / 3.33:1. The previous values (light `#D6C9B0` at 1.44:1, dark `.14` at 1.50:1) did not.
+3. **Badge and chip tones live in the border, not the label.** Only `accent`, which clears AA in both themes, is allowed to colour a word.
 
 ### 9.3 Category color-coding
 Each craft category maps to one dye tone (`indigo`, `madder`, `marigold`, `brass`) used on its chip and small accents. This is the one place the multi-color palette appears; the marketplace chrome otherwise stays disciplined to a single accent per theme.
 
 ### 9.4 Typography
 Fraunces for display and headings. Hanken Grotesk for body. Editorial scale, generous whitespace, calm and confident. Keep Mukta or Hind available as Devanagari-capable fallbacks for future languages.
+
+**Resolved Increment 5.** Both faces are loaded and sit ahead of Mukta in the stacks:
+
+```
+--font-display: 'Fraunces', ui-serif, Georgia, 'Mukta', serif;
+--font-body:    'Hanken Grotesk', ui-sans-serif, system-ui, 'Mukta', sans-serif;
+```
+
+Fraunces is set at weight 600 with `SOFT 30, WONK 1`, tracking `-0.02em`. Weight and a little optical wonk rather than thin high-contrast strokes: a sturdy, printerly serif reads as woodblock and hand-cut type, which is the subject matter, and avoids the thin-serif craft-page cliché §9.8 warns about. Scale is a 1.25 minor third off a 16px body.
 
 ### 9.5 Shape binary (strict)
 Interactive controls (buttons, chips, badges) are full capsules, `border-radius: 999px`. Containers and cards are soft rounded rectangles, 18 to 28px. Do not mix these.

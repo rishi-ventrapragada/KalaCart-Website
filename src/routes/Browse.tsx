@@ -6,8 +6,8 @@ export default function Browse() {
   const t = useT()
 
   return (
-    <Container className="py-16">
-      <h1 className="text-2xl font-semibold">{t('browse.title')}</h1>
+    <Container className="py-20">
+      <h1 className="text-3xl">{t('browse.title')}</h1>
     </Container>
   )
 }
