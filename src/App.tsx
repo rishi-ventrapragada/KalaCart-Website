@@ -4,6 +4,7 @@ import AppShell from '@/app/AppShell'
 import RootProviders from '@/app/RootProviders'
 import AdminLayout from '@/routes/admin/AdminLayout'
 import AdminLogin from '@/routes/admin/AdminLogin'
+import ArtisanManagement from '@/routes/admin/ArtisanManagement'
 import { AdminPlaceholder } from '@/routes/admin/AdminPlaceholder'
 import { RequireAdmin } from '@/routes/admin/RequireAdmin'
 import VerificationQueue from '@/routes/admin/VerificationQueue'
@@ -45,15 +46,7 @@ export default function App() {
             <Route element={<AdminLayout />}>
               <Route path="/admin" element={<Navigate to="/admin/queue" replace />} />
               <Route path="/admin/queue" element={<VerificationQueue />} />
-              <Route
-                path="/admin/artisans"
-                element={
-                  <AdminPlaceholder
-                    titleKey="admin.placeholder.artisansTitle"
-                    bodyKey="admin.placeholder.artisansBody"
-                  />
-                }
-              />
+              <Route path="/admin/artisans" element={<ArtisanManagement />} />
               <Route
                 path="/admin/analytics"
                 element={

@@ -108,14 +108,62 @@ export const admin = {
       previewImages: 'Images',
     },
 
+    artisans: {
+      title: 'Artisans',
+      intro: 'Every artisan on the platform, and what buyers can see of them.',
+      search: 'Search artisans',
+      searchPlaceholder: 'Name or region',
+      filterStatus: 'Status',
+      filterCategory: 'Craft',
+      filterRegion: 'Region',
+      allStatuses: 'Any status',
+      allCategories: 'Any craft',
+      allRegions: 'Anywhere',
+      clear: 'Clear filters',
+      /** {count} is replaced at call time. */
+      count: '{count} artisans',
+      countOne: '1 artisan',
+      colArtisan: 'Artisan',
+      colCraft: 'Craft',
+      colRegion: 'Region',
+      colStatus: 'Status',
+      colProducts: 'Listings',
+      colActions: 'Actions',
+      /** {count} is replaced at call time. */
+      productCount: '{count} listed',
+      statusPending: 'Pending',
+      statusApproved: 'Approved',
+      statusRejected: 'Rejected',
+      approve: 'Approve',
+      reject: 'Reject',
+      reinstate: 'Reinstate',
+      emptyTitle: 'No artisans match these filters',
+      emptyBody: 'Try a different status or region, or clear the filters.',
+      error: 'Could not load the artisan records.',
+      /*
+       * The two confirms name the CONSEQUENCE to buyers, not the database
+       * change. "Set status to rejected" tells an official nothing about what
+       * they are actually doing to a real person's shopfront.
+       */
+      confirmApproveTitle: 'Publish this artisan?',
+      confirmApproveBody:
+        'Their profile and approved listings become visible to buyers straight away.',
+      confirmApproveAction: 'Approve',
+      confirmRemoveTitle: 'Remove this artisan from the site?',
+      confirmRemoveBody:
+        'Their profile stops being visible to buyers, including anyone holding a link to it. You can reinstate them later.',
+      confirmRemoveAction: 'Remove',
+      changedApproved: '{name} is now visible to buyers.',
+      changedRejected: '{name} is no longer visible to buyers.',
+      changedPending: '{name} is back in the review queue.',
+      failedToast: 'Could not save that change. {name} is unchanged.',
+    },
+
     /*
-     * Placeholder surfaces. The artisan table and the analytics charts are
-     * Increments 14 and 15; each tab says which increment fills it rather than
-     * showing an empty panel that looks broken.
+     * Placeholder surface. The analytics charts are Increment 15; the tab says
+     * so rather than showing an empty panel that looks broken.
      */
     placeholder: {
-      artisansTitle: 'Artisans',
-      artisansBody: 'The searchable artisan table is built in Increment 14.',
       analyticsTitle: 'Analytics',
       analyticsBody: 'Stat cards and charts are built in Increment 15.',
     },

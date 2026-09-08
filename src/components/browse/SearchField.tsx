@@ -11,6 +11,13 @@ interface SearchFieldProps {
   value: string
   /** Called with the debounced text; the caller writes it to the URL. */
   onCommit: (value: string) => void
+  /**
+   * Copy for surfaces other than Browse. Optional so Browse's own call is
+   * unchanged; the admin artisan table searches people, not crafts, and a box
+   * labelled "Search crafts" over a list of names would be wrong.
+   */
+  label?: string
+  placeholder?: string
 }
 
 /**
@@ -27,7 +34,7 @@ interface SearchFieldProps {
  * a second time and re-render. React's own "adjusting state on prop change"
  * pattern, which is why there is no syncing effect here.
  */
-export function SearchField({ value, onCommit }: SearchFieldProps) {
+export function SearchField({ value, onCommit, label, placeholder }: SearchFieldProps) {
   const [text, setText] = useState(value)
   const [urlValue, setUrlValue] = useState(value)
 
@@ -58,10 +65,10 @@ export function SearchField({ value, onCommit }: SearchFieldProps) {
 
   return (
     <Input
-      label={t('browse.filters.search')}
+      label={label ?? t('browse.filters.search')}
       type="search"
       value={text}
-      placeholder={t('browse.filters.searchPlaceholder')}
+      placeholder={placeholder ?? t('browse.filters.searchPlaceholder')}
       onChange={(event) => {
         setText(event.target.value)
       }}
