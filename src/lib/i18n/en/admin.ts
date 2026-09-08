@@ -42,7 +42,16 @@ export const admin = {
       heading: 'Demonstration gate, not real security',
       body: 'This build has no backend. The credential below is in the public code and anyone can sign in with it. Real email and password sign-in arrives with Supabase.',
       credentialLabel: 'Use',
-      bannerShort: 'Mock sign-in. Anyone with the demo credential can reach this desk.',
+      /*
+       * The second clause was added in Increment 13. Approvals and rejections
+       * write to an in-memory store that resets on reload, so a reviewer who
+       * approves an artisan, refreshes, and finds them waiting again would
+       * otherwise reasonably conclude the desk had lost their decision. The
+       * banner is the one place that already carries what this build really
+       * is, so the caveat goes here rather than onto every row.
+       */
+      bannerShort:
+        'Mock sign-in. Anyone with the demo credential can reach this desk, and approvals reset when the page reloads.',
     },
 
     nav: {
