@@ -6,6 +6,7 @@ import AdminLayout from '@/routes/admin/AdminLayout'
 import AdminLogin from '@/routes/admin/AdminLogin'
 import { AdminPlaceholder } from '@/routes/admin/AdminPlaceholder'
 import { RequireAdmin } from '@/routes/admin/RequireAdmin'
+import VerificationQueue from '@/routes/admin/VerificationQueue'
 import ArtisanProfile from '@/routes/ArtisanProfile'
 import Browse from '@/routes/Browse'
 import Home from '@/routes/Home'
@@ -43,15 +44,7 @@ export default function App() {
           <Route element={<RequireAdmin />}>
             <Route element={<AdminLayout />}>
               <Route path="/admin" element={<Navigate to="/admin/queue" replace />} />
-              <Route
-                path="/admin/queue"
-                element={
-                  <AdminPlaceholder
-                    titleKey="admin.placeholder.queueTitle"
-                    bodyKey="admin.placeholder.queueBody"
-                  />
-                }
-              />
+              <Route path="/admin/queue" element={<VerificationQueue />} />
               <Route
                 path="/admin/artisans"
                 element={

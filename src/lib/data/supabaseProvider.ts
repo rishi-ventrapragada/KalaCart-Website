@@ -20,6 +20,8 @@ export const supabaseProvider = {
   getCategories: notWired,
   getPendingArtisans: notWired,
   setArtisanStatus: notWired,
+  getPendingProducts: notWired,
+  setProductStatus: notWired,
   getAllArtisans: notWired,
   createInquiry: notWired,
   getAnalyticsSummary: notWired,

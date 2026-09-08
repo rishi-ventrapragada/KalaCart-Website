@@ -32,6 +32,12 @@ export const getPendingArtisans: DataProvider['getPendingArtisans'] = () =>
 export const setArtisanStatus: DataProvider['setArtisanStatus'] = (id, status) =>
   provider.setArtisanStatus(id, status)
 
+export const getPendingProducts: DataProvider['getPendingProducts'] = () =>
+  provider.getPendingProducts()
+
+export const setProductStatus: DataProvider['setProductStatus'] = (id, status) =>
+  provider.setProductStatus(id, status)
+
 export const getAllArtisans: DataProvider['getAllArtisans'] = (filters) =>
   provider.getAllArtisans(filters)
 

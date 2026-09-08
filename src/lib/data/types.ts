@@ -109,6 +109,18 @@ export interface DataProvider {
   getCategories(): Promise<Category[]>
   getPendingArtisans(): Promise<Artisan[]>
   setArtisanStatus(id: string, status: Status): Promise<void>
+  /**
+   * The product half of the verification queue (PRD 11.6).
+   *
+   * Added in Increment 13. PRD 5.2 lists only the artisan pair, but 11.6
+   * specifies tabs for BOTH artisans and products, and the mock fixtures
+   * already carry pending products - the page spec and the function list
+   * disagreed, and the page spec is the one describing what a reviewer does.
+   * These mirror the artisan pair exactly so the Supabase implementation is
+   * the same query against the other table.
+   */
+  getPendingProducts(): Promise<Product[]>
+  setProductStatus(id: string, status: Status): Promise<void>
   getAllArtisans(filters?: ArtisanFilters): Promise<Artisan[]>
   createInquiry(input: NewInquiry): Promise<void>
   getAnalyticsSummary(): Promise<AnalyticsSummary>

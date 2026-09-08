@@ -112,6 +112,21 @@ async function setArtisanStatus(id: string, status: Status): Promise<void> {
   artisan.status = status
 }
 
+/** The product half of the queue (PRD 11.6). Mirrors getPendingArtisans. */
+async function getPendingProducts(): Promise<Product[]> {
+  await latency()
+  return store.products
+    .filter((p) => p.status === 'pending')
+    .map((p) => ({ ...p, imageUrls: [...p.imageUrls] }))
+}
+
+async function setProductStatus(id: string, status: Status): Promise<void> {
+  await latency()
+  const product = store.products.find((p) => p.id === id)
+  if (!product) throw new Error(`No product with id ${id}`)
+  product.status = status
+}
+
 async function getAllArtisans(filters?: ArtisanFilters): Promise<Artisan[]> {
   await latency()
   let result = [...store.artisans]
@@ -164,6 +179,8 @@ export const mockProvider = {
   getCategories,
   getPendingArtisans,
   setArtisanStatus,
+  getPendingProducts,
+  setProductStatus,
   getAllArtisans,
   createInquiry,
   getAnalyticsSummary,

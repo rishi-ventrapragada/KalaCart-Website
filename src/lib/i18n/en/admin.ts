@@ -53,15 +53,58 @@ export const admin = {
       backToSite: 'Back to site',
     },
 
+    queue: {
+      title: 'Verification queue',
+      intro: 'Approve or reject what artisans have submitted.',
+      tabArtisans: 'Artisans',
+      tabProducts: 'Products',
+      /** {count} is replaced at call time. */
+      pendingCount: '{count} waiting',
+      approve: 'Approve',
+      reject: 'Reject',
+      preview: 'Preview',
+      submitted: 'Submitted {date}',
+      /*
+       * PRD 11.6 asks for this exact sentiment: the desk being clear is good
+       * news, not an absence, so the copy says so rather than reporting a
+       * count of zero.
+       */
+      emptyArtisans: 'Nothing waiting for review, you are all caught up',
+      emptyProducts: 'No products waiting for review, you are all caught up',
+      error: 'Could not load the queue.',
+      confirmArtisanTitle: 'Reject this artisan?',
+      confirmArtisanBody:
+        'They will not appear to buyers. You can change this later from the artisan records.',
+      confirmProductTitle: 'Reject this listing?',
+      confirmProductBody:
+        'It will not appear to buyers. You can change this later from the artisan records.',
+      confirmReject: 'Reject',
+      approvedToast: '{name} approved.',
+      rejectedToast: '{name} rejected.',
+      /*
+       * The failure toast names the row and says the change did not save,
+       * because the row reappearing is otherwise indistinguishable from a
+       * misclick. A moderation desk that silently loses a decision is worse
+       * than one that refuses it loudly.
+       */
+      failedToast: 'Could not save that change. {name} is still waiting for review.',
+      previewTitle: 'Details',
+      previewRegion: 'Region',
+      previewCraft: 'Craft',
+      previewPrice: 'Price',
+      previewSubmitted: 'Submitted',
+      previewDescription: 'Description',
+      previewArtisan: 'Artisan',
+      previewPhone: 'Phone',
+      previewImages: 'Images',
+    },
+
     /*
-     * Placeholder surfaces. The queue, the artisan table and the analytics
-     * charts are Increments 13, 14 and 15; this increment builds the gate and
-     * the frame they will hang in, and says so rather than showing an empty
-     * panel that looks broken.
+     * Placeholder surfaces. The artisan table and the analytics charts are
+     * Increments 14 and 15; each tab says which increment fills it rather than
+     * showing an empty panel that looks broken.
      */
     placeholder: {
-      queueTitle: 'Verification queue',
-      queueBody: 'The approve and reject desk is built in Increment 13.',
       artisansTitle: 'Artisans',
       artisansBody: 'The searchable artisan table is built in Increment 14.',
       analyticsTitle: 'Analytics',
