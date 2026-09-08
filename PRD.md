@@ -423,6 +423,8 @@ Layout: two columns on desktop, stacked on mobile.
 - Primary action: "Contact artisan" opens InquiryModal. Secondary: a WhatsApp button built from the artisan phone via `buildWhatsappLink`.
 - Below: "More from this artisan" mini grid.
 InquiryModal: buyerName, buyerContact, message, validated, submitting state, success toast, failure message. Calls `createInquiry`. No purchase, ever.
+
+**Resolved Increment 10.** The success copy states what actually happened: "Inquiry saved. In the full version this reaches the artisan directly." This build writes to an in-memory mock that resets on reload, so "Your message has been sent" would read as literally true to anyone seeing the site demoed, including a reviewer with no way to know otherwise. A code comment marking it MOCK does not reach that person; the copy has to. Two behaviours are load-bearing and easy to lose: a failed send keeps the modal open with everything typed still in it, and the modal cannot be dismissed while the write is in flight.
 States: loading (skeleton layout), not-found (designed empty state plus link back to Browse), error.
 
 ### 11.5 Artisan profile (`/artisan/:id`)
@@ -472,7 +474,7 @@ Each increment ends deployed to Vercel and verified in the browser before the ne
 | 7 | Home hero: material field, line-mask headline with accent underline, craft rail, progress bar, nav glass | **Done.** Full hero motion in both themes, reduced-motion frozen, 254 assertions green |
 | 8 | Home sections: featured artisans, featured products, impact band | **Done.** All render from the seam with loading, empty and error states; 352 assertions green |
 | 9 | Browse and search (URL-driven filters, reveal-only) | Filtering, sorting, search work and are shareable |
-| 10 | Product detail + ImageGallery + InquiryModal + WhatsApp | View a product, browse the gallery, send a mock inquiry, open WhatsApp |
+| 10 | Product detail + ImageGallery + InquiryModal + WhatsApp | **Done.** Gallery keyboard-navigable, inquiry validated with an honest mock-write toast, WhatsApp link built from the artisan phone; 113 assertions |
 | 11 | Artisan profile (minimal) | Header plus their products render |
 | 12 | Admin auth gate + AdminLayout | `/admin/*` gated, login and logout work (mock) |
 | 13 | Verification queue | Approve and reject move items, confirm plus toast |

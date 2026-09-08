@@ -23,8 +23,11 @@ version of this file used a different, conflicting numbering; it was replaced on
       `ProductCard` moved to `components/product/`, i18n dictionary split into
       six per-surface segments. 416 assertions green. Shipped in `d4d6715`.
 
+- [x] **10** Product detail — keyboard-navigable gallery, validated inquiry
+      modal with honest mock-write copy, WhatsApp link, not-found state.
+      113 assertions green.
+
 ## Next
-- [ ] **10** Product detail + ImageGallery + InquiryModal + WhatsApp
 - [ ] **11** Artisan profile (minimal)
 - [ ] **12** Admin auth gate + AdminLayout
 - [ ] **13** Verification queue

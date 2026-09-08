@@ -61,3 +61,13 @@
   - *Context:* The craft rail used a fixed fraction of its overflow, tuned at 1280px. At 360px the rail is over four viewports wide: the first card started off-screen to the right (x=468) and the last was never reachable.
   - *Decision:* Map the section's progress onto the rail's actual overflow, clamped, so the first card is flush on entry and the last is reached on exit at any width.
   - *Why:* A phone reader otherwise arrives at an apparently empty strip and can never see the later crafts. Now asserted in the harness at both widths so it cannot regress.
+
+- **2026-09-08 · Mock Behaviour Is Disclosed in the UI, Not Just in Code** *(Increment 10)*
+  - *Context:* The inquiry form's success toast was planned as "Your message has been sent", with a code comment marking the write as MOCK.
+  - *Decision:* The copy reads "Inquiry saved. In the full version this reaches the artisan directly."
+  - *Why:* `createInquiry` writes to an in-memory store that resets on reload. Nothing reaches any artisan. A judge or ministry reviewer seeing the site demoed takes on-screen copy at face value and has no way to read a code comment, so the honest disclosure has to be where they are looking. Applies to the mocked admin auth in Increment 12 too.
+
+- **2026-09-08 · Focus-on-Invalid Must Not Query the DOM Synchronously** *(Increment 10)*
+  - *Context:* The inquiry form focused the first invalid field with `querySelector('[aria-invalid="true"]')` inside the submit handler. Verification found focus stayed on the submit button.
+  - *Decision:* Derive the first invalid field from the validation result's field order, then index into the form's controls.
+  - *Why:* The handler runs before React re-renders, so `aria-invalid` is not on the DOM yet and the query returns nothing. The fields were correctly marked and correctly focusable; only the timing was wrong, which is exactly the kind of defect that looks fine in a screenshot and fails for a keyboard user.

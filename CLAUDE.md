@@ -33,6 +33,7 @@ Stage: active development / pre-launch.
 - `2026-09-08` — Decoration yields to legibility where they overlap: the hero grain is masked away from the reading column rather than thinned globally, because thinning enough to clear AA leaves nothing visible.
 - `2026-09-08` — Buyer-facing numbers are counted from buyer-facing reads, never from `getAnalyticsSummary()`, which is an admin view including pending and rejected rows.
 - `2026-09-08` — Remote imagery renders through `RemoteImage`: the wrapper owns the geometry so a dead image cannot collapse a card's layout.
+- `2026-09-08` — Mock behaviour is disclosed in the UI, not just in code comments. A demo reviewer takes on-screen copy at face value and cannot read a comment.
 
 ## E · Memory Map
 What lives under `/memory`:
