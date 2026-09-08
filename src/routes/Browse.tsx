@@ -116,8 +116,21 @@ export default function Browse() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[16rem_1fr] lg:gap-10">
-        {/* The panel is inline from lg up, and inside the drawer below it. */}
-        <aside className="hidden lg:block">{panel}</aside>
+        {/*
+          The panel is inline from lg up, and inside the drawer below it.
+
+          The heading is sr-only rather than absent: the drawer version carries
+          a visible "Filters" title, but inline the surrounding layout already
+          makes the region obvious to a sighted reader, and a second visible
+          title would be noise. Without it the page skipped h1 to h3 (the
+          product cards), which the Increment 16 sweep caught.
+        */}
+        <aside className="hidden lg:block" aria-labelledby="filters-heading">
+          <h2 id="filters-heading" className="sr-only">
+            {t('browse.filters.heading')}
+          </h2>
+          {panel}
+        </aside>
 
         <ResultsGrid
           state={products.state}

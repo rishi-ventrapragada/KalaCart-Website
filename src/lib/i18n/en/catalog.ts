@@ -2,7 +2,6 @@
 export const catalog = {
   product: {
     /** {id} is replaced at call time. */
-    detailTitle: 'Product {id}',
     by: 'Made by',
     description: 'About this piece',
     contact: 'Contact artisan',

@@ -291,10 +291,6 @@ p {
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  /* Defaults so the field is correct before the first engine frame, and stays
-     correct under reduced motion where no frame is ever written. */
-  --field-p: 0;
-  --field-drift: 0px;
 }
 
 /*

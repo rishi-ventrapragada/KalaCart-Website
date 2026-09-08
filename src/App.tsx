@@ -11,7 +11,6 @@ import VerificationQueue from '@/routes/admin/VerificationQueue'
 import ArtisanProfile from '@/routes/ArtisanProfile'
 import Browse from '@/routes/Browse'
 import Home from '@/routes/Home'
-import KitchenSink from '@/routes/KitchenSink'
 import NotFound from '@/routes/NotFound'
 import ProductDetail from '@/routes/ProductDetail'
 
@@ -29,8 +28,6 @@ export default function App() {
           <Route element={<AppShell />}>
             <Route path="/" element={<Home />} />
             <Route path="/browse" element={<Browse />} />
-            {/* Development only; removed in the Increment 16 polish pass. */}
-            <Route path="/kitchen-sink" element={<KitchenSink />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/artisan/:id" element={<ArtisanProfile />} />
             <Route path="*" element={<NotFound />} />

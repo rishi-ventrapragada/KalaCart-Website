@@ -37,3 +37,39 @@ values* rather than attribute flips. Worth keeping the pattern for Increments
    the rail takes `overflow-x: auto` with snap points. Applies to anything
    similar in Increments 8-10.
 
+## Resolved (Increment 16)
+10. **Dead per-frame work in `MaterialField`.** Both instances (hero and the
+    closing bookend) subscribed to the scroll engine and wrote `--field-p` and
+    `--field-drift` every frame. Nothing had read either since the dye washes
+    were removed in Increment 7 — a `getBoundingClientRect` plus two style
+    writes per frame, on the one route already carrying the whole motion
+    system, feeding nothing. Component is now static; the two custom properties
+    are gone from the CSS. Verified the grain renders identically before and
+    after scroll.
+11. **The craft rail's error state had no retry.** It rendered bare text telling
+    the reader to reload the page — the only error state on the site without an
+    action, contradicting PRD 5.4, which requires a retry on every one. Now uses
+    `ErrorState` with a real retry, and the copy no longer mentions reloading.
+12. **Cascading render in the rail's retry.** The first fix called
+    `setState('loading')` at the top of the effect, which starts a second render
+    pass on every run; oxlint's `react(set-state-in-effect)` caught it. Loading
+    is now *derived* by comparing the attempt a result belongs to against the
+    current one — the same trick `useAsyncData` already uses. **Worth copying
+    wherever a component hand-rolls a fetch instead of using that hook.**
+13. **`ArtisanRow` had no empty state.** With no approved artisans it rendered a
+    heading and a "See all artisans" link over an empty grid, which reads as a
+    broken layout. Now matches `ProductGrid`.
+14. **Twelve orphaned i18n keys**, including one added the increment before and
+    never used. Removed. The typed key union means the build proves they were
+    unreferenced.
+
+## Active watch-out added Increment 16
+6. **A dev-only route ships to production unless deliberately removed.**
+   `/kitchen-sink` was in the public bundle and reachable by URL for nine
+   increments, only ever caught because a comment said to remove it. Anything
+   added "temporarily" needs an owner and a removal increment written down at
+   the moment it is added, not a comment hoping someone reads it.
+7. **The audit sweep is structure, not looks.** `npm run audit` proves contrast,
+   overflow, focus and heading order. It says nothing about whether a page reads
+   well or a chart is legible, so both themes still need a human pass.
+

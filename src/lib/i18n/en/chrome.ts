@@ -18,7 +18,6 @@ export const chrome = {
   footer: {
     programLine:
       'Connecting marginalised artisans to buyers, with no commission and no middlemen.',
-    categoriesHeading: 'Crafts',
     exploreHeading: 'Explore',
     credit: 'Smart India Hackathon 2026 - SIH26090',
     ministry: 'Ministry of Social Justice and Empowerment',

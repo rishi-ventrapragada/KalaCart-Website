@@ -27,21 +27,31 @@ version of this file used a different, conflicting numbering; it was replaced on
       modal with honest mock-write copy, WhatsApp link, not-found state.
       113 assertions green.
 
+- [x] **11** Artisan profile — header plus their approved products.
+- [x] **12** Admin auth gate + AdminLayout — mock gate, disclosed on screen.
+- [x] **13** Verification queue — approve/reject with confirm, toast, rollback.
+- [x] **14** Artisan management — searchable, filterable table with row actions.
+- [x] **15** Analytics — five stat cards and two hand-rolled SVG/CSS charts.
+      Recharts dropped; see CLAUDE.md section D. Shipped in `b5bc8ae`.
+
+- [x] **16** Polish pass — designed 404, `/kitchen-sink` removed from the public
+      bundle, dead per-frame work cleared, craft-rail error given a real retry,
+      `ArtisanRow` empty state added, twelve orphaned i18n keys removed, and a
+      committed acceptance sweep (`npm run audit`) that found and fixed a
+      heading-order break on `/browse`.
+
 ## Next
-- [ ] **11** Artisan profile (minimal)
-- [ ] **12** Admin auth gate + AdminLayout
-- [ ] **13** Verification queue
-- [ ] **14** Artisan management
-- [ ] **15** Analytics
-- [ ] **16** Polish pass: responsive audit, focus states, reduced-motion, 404
+- [ ] Supabase wiring (PRD 15) — blocked on the four PRD 16 open questions.
+      Separate task; do not start it inside a front-end increment.
 
 ## Carried debt
-- `MaterialField` still subscribes to the scroll engine and writes `--field-p`
-  every frame, but nothing paints from it since the dye washes were removed.
-  Drop the subscription if the grain stays as-is.
+- ~~`MaterialField` writes `--field-p` every frame with nothing painting from
+  it.~~ Cleared in Increment 16: both instances (hero and closing bookend) are
+  now static, and the two dead custom properties are gone from the CSS.
 - No `featured` flag in the shared schema, so the Home grid uses recency.
   Worth raising with the teammate — belongs in PRD 16's open questions.
-- `lab/` (Playwright harness + screenshots) is gitignored and local only.
+- `lab/` was gitignored and local only. Superseded in Increment 16 by
+  `audit/`, a committed acceptance sweep run with `npm run audit`.
 
 ## Deployment
 PRD 13 governs: **each increment ends deployed to Vercel and verified in the

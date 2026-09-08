@@ -32,6 +32,8 @@ export const browse = {
     },
 
     results: {
+      /** sr-only region heading; keeps the page's heading order unbroken. */
+      heading: 'Results',
       /** {count} is the number of matching crafts. */
       count: '{count} crafts',
       countOne: '1 craft',

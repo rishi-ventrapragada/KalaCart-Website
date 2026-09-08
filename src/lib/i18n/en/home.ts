@@ -27,13 +27,16 @@ export const home = {
     },
     rail: {
       heading: 'Browse by craft',
-      error: 'Could not load crafts. Reload the page to try again.',
+      error: 'Could not load crafts.',
     },
     artisans: {
       heading: 'Meet the makers',
       body: 'Verified artisans listing their own work, in their own words.',
       error: 'Could not load artisans.',
       seeAll: 'See all artisans',
+      /* Matches the products grid: a section that resolves to nothing says so
+         rather than leaving a heading over an empty row (PRD 5.4). */
+      empty: 'No artisans are listed yet.',
     },
     products: {
       heading: 'Recently listed',

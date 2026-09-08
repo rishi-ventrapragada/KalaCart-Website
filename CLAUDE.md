@@ -19,7 +19,8 @@ Stage: active development / pre-launch.
 - **Hosting / infra:** Vercel
 - **Key services:** Supabase (shared backend via data seam)
 - **Run locally:** `npm run dev`
-- **Key files:** `PRD.md` · `src/lib/data/` (data seam) · `src/lib/i18n/` · `src/App.tsx`
+- **Key files:** `PRD.md` · `src/lib/data/` (data seam) · `src/lib/i18n/` · `src/App.tsx` · `audit/` (acceptance sweep)
+- **Verify:** `npm run build && npm run preview -- --port 4173`, then `npm run audit` in another terminal
 
 ## D · Decisions
 *One line each. Date · what · why.*
@@ -35,6 +36,7 @@ Stage: active development / pre-launch.
 - `2026-09-08` — Remote imagery renders through `RemoteImage`: the wrapper owns the geometry so a dead image cannot collapse a card's layout.
 - `2026-09-08` — Mock behaviour is disclosed in the UI, not just in code comments. A demo reviewer takes on-screen copy at face value and cannot read a comment.
 - `2026-09-08` — Admin charts are hand-rolled SVG, not Recharts. Supersedes the Recharts mention in §C and PRD 11.8. Two charts on one gated page do not justify ~90 kB gzipped of D3, and inline SVG reads the theme's CSS variables and category dye tones directly instead of needing a theme-reading wrapper around `ResponsiveContainer`. See `memory/decisions.md`.
+- `2026-09-08` — Acceptance criteria are enforced by a committed sweep (`npm run audit`), not by memory. Structure, contrast, overflow, focus and reduced-motion are checked on the production build across four widths and both themes; looks still need a human pass. See `audit/README.md`.
 
 ## E · Memory Map
 What lives under `/memory`:

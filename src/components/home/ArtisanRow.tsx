@@ -2,6 +2,7 @@ import { ArtisanCard } from '@/components/home/ArtisanCard'
 import { SectionHeader } from '@/components/home/SectionHeader'
 import { Container } from '@/components/layout/Container'
 import { Reveal } from '@/components/motion/Reveal'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { getAllArtisans, getCategories } from '@/lib/data'
@@ -29,6 +30,8 @@ export function ArtisanRow() {
   const failed = artisans.state === 'error' || categories.state === 'error'
   const loading = artisans.state === 'loading' || categories.state === 'loading'
 
+  const featured = (artisans.data ?? []).slice(0, FEATURED_COUNT)
+
   const retry = (): void => {
     artisans.retry()
     categories.retry()
@@ -46,23 +49,31 @@ export function ArtisanRow() {
 
         {failed ? (
           <ErrorState message={t('home.artisans.error')} onRetry={retry} />
+        ) : loading ? (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {Array.from({ length: FEATURED_COUNT }, (_, i) => (
+              // Same geometry as the real card, so nothing reflows on arrival.
+              <Skeleton key={i} className="h-[13.5rem] rounded-card" />
+            ))}
+          </div>
+        ) : featured.length === 0 ? (
+          /*
+           * Added in Increment 16. This branch was missing: with no approved
+           * artisans the section rendered its heading and "See all artisans"
+           * over an empty grid, which reads as a broken layout rather than as
+           * an empty catalogue. Matches ProductGrid (PRD 5.4, three states).
+           */
+          <EmptyState title={t('home.artisans.empty')} />
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {loading
-              ? Array.from({ length: FEATURED_COUNT }, (_, i) => (
-                  // Same geometry as the real card, so nothing reflows on arrival.
-                  <Skeleton key={i} className="h-[13.5rem] rounded-card" />
-                ))
-              : (artisans.data ?? []).slice(0, FEATURED_COUNT).map((artisan, i) => (
-                  <Reveal key={artisan.id} delay={i * 80}>
-                    <ArtisanCard
-                      artisan={artisan}
-                      category={(categories.data ?? []).find(
-                        (c) => c.id === artisan.categoryId,
-                      )}
-                    />
-                  </Reveal>
-                ))}
+            {featured.map((artisan, i) => (
+              <Reveal key={artisan.id} delay={i * 80}>
+                <ArtisanCard
+                  artisan={artisan}
+                  category={(categories.data ?? []).find((c) => c.id === artisan.categoryId)}
+                />
+              </Reveal>
+            ))}
           </div>
         )}
       </Container>

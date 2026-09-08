@@ -80,7 +80,17 @@ export function ResultsGrid({
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <section className="flex flex-col gap-6" aria-labelledby="results-heading">
+      {/*
+        sr-only, because the count below already says what this region is to a
+        sighted reader. It exists so the product cards' h3 headings sit under an
+        h2 rather than jumping straight from the page h1 - caught by the
+        Increment 16 sweep, which checks heading order on every route.
+      */}
+      <h2 id="results-heading" className="sr-only">
+        {t('browse.results.heading')}
+      </h2>
+
       {/*
         Announced politely: a reader who changes a filter with a screen reader
         gets the new count without the page stealing focus.
@@ -104,6 +114,6 @@ export function ResultsGrid({
           </Reveal>
         ))}
       </div>
-    </div>
+    </section>
   )
 }

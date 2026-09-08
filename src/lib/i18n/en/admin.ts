@@ -97,7 +97,6 @@ export const admin = {
        * than one that refuses it loudly.
        */
       failedToast: 'Could not save that change. {name} is still waiting for review.',
-      previewTitle: 'Details',
       previewRegion: 'Region',
       previewCraft: 'Craft',
       previewPrice: 'Price',
@@ -105,7 +104,6 @@ export const admin = {
       previewDescription: 'Description',
       previewArtisan: 'Artisan',
       previewPhone: 'Phone',
-      previewImages: 'Images',
     },
 
     artisans: {
@@ -192,8 +190,6 @@ export const admin = {
       overTimeColMonth: 'Month',
       overTimeColAdded: 'Joined',
       overTimeColTotal: 'Total',
-      /** {count} and {month} are replaced at call time. */
-      overTimePoint: '{count} by {month}',
 
       /** Names the table that carries each chart's numbers for a screen reader. */
       tableLabel: '{title}, as a table',

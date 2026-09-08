@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { useRailDrift } from '@/components/motion/useRailDrift'
+import { ErrorState } from '@/components/ui/ErrorState'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { getCategories } from '@/lib/data'
 import type { Category } from '@/lib/data'
@@ -30,43 +31,69 @@ const DYE_DOT: Record<Category['dye'], string> = {
  * the moment the page stops behaving like a document, and it doubles as the
  * browse-by-craft strip PRD 11.2 asks for.
  *
- * Data comes through the seam, never from a fixture, and all three states are
- * handled (PRD 5.4). The dye tone lives in the card's border and dot, never in
- * its label, per the Increment 5 contrast resolution.
+ * Data comes through the seam, never from a fixture, with loading and a
+ * retryable error state (PRD 5.4). There is no empty branch: the categories are
+ * the site's fixed taxonomy, so an empty result is a failure, not a state. The
+ * dye tone lives in the card's border and dot, never in its label, per the
+ * Increment 5 contrast resolution.
  */
 export function CraftRail() {
   const rail = useRailDrift<HTMLDivElement>(0.85)
-  const [state, setState] = useState<'loading' | 'error' | 'ready'>('loading')
-  const [categories, setCategories] = useState<Category[]>([])
+  const [result, setResult] = useState<{
+    attempt: number
+    state: 'loading' | 'error' | 'ready'
+    categories: Category[]
+  }>({ attempt: -1, state: 'loading', categories: [] })
   const t = useT()
+
+  /*
+   * Bumped to re-run the effect on retry. The effect owns the `live` flag that
+   * guards against a late response landing after unmount, so re-entering it is
+   * safer than calling a hoisted loader that would need its own guard.
+   */
+  const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
     let live = true
 
-    const load = (): void => {
-      setState('loading')
-      getCategories()
-        .then((result) => {
-          if (!live) return
-          setCategories(result)
-          setState('ready')
-        })
-        .catch(() => {
-          if (live) setState('error')
-        })
-    }
+    getCategories()
+      .then((result) => {
+        if (!live) return
+        setResult({ attempt, state: 'ready', categories: result })
+      })
+      .catch(() => {
+        if (live) setResult({ attempt, state: 'error', categories: [] })
+      })
 
-    load()
     return () => {
       live = false
     }
-  }, [])
+  }, [attempt])
+
+  /*
+   * Loading is DERIVED, not set. Writing `setState('loading')` at the top of the
+   * effect would start a second render pass on every run, which is exactly what
+   * `useAsyncData` avoids by storing the attempt a result belongs to - a result
+   * from an earlier attempt simply means this one is still in flight.
+   */
+  const settled = result.attempt === attempt
+  const state = settled ? result.state : 'loading'
+  const categories = settled ? result.categories : []
 
   if (state === 'error') {
+    /*
+     * A real retry, added in Increment 16. This branch used to render bare text
+     * telling the reader to reload the whole page - the only error state on the
+     * site without an action, and a contradiction of PRD 5.4, which requires a
+     * retry on every one. The copy was changed to match.
+     */
     return (
-      <div className="py-6 text-center">
-        <p className="text-sm text-muted">{t('home.rail.error')}</p>
-      </div>
+      <ErrorState
+        message={t('home.rail.error')}
+        onRetry={() => {
+          setAttempt((n) => n + 1)
+        }}
+      />
     )
   }
 
