@@ -14,14 +14,16 @@ version of this file used a different, conflicting numbering; it was replaced on
 - [x] **6** Motion primitives: Lenis shell, useReveal, useScrollEngine
 - [x] **7** Home hero — material field, line-mask headline with accent underline,
       craft rail, progress bar, nav glass. Both themes, 360/1280,
-      reduced-motion. *Not yet deployed: awaiting owner sign-off.*
+      reduced-motion. Shipped in `6b44172`.
 - [x] **8** Home sections — featured artisans row, featured products grid (8
       newest approved), impact band. All three states each, `useAsyncData`
       extracted, `ProductCard` set as the reusable pattern for Increment 9.
-      352 assertions green. *Not yet deployed.*
+      352 assertions green. Shipped in `6b44172`.
+- [x] **9** Browse and search — URL-driven filters, reveal-only motion,
+      `ProductCard` moved to `components/product/`, i18n dictionary split into
+      six per-surface segments. 416 assertions green. Shipped in `d4d6715`.
 
 ## Next
-- [ ] **9** Browse and search — URL-driven filters, reveal-only motion
 - [ ] **10** Product detail + ImageGallery + InquiryModal + WhatsApp
 - [ ] **11** Artisan profile (minimal)
 - [ ] **12** Admin auth gate + AdminLayout
@@ -36,8 +38,15 @@ version of this file used a different, conflicting numbering; it was replaced on
   Drop the subscription if the grain stays as-is.
 - No `featured` flag in the shared schema, so the Home grid uses recency.
   Worth raising with the teammate — belongs in PRD 16's open questions.
-- `ProductCard` is now the shared pattern. Increment 9 should import it rather
-  than writing a second card, and move it out of `components/home/` when it
-  gains a second caller.
 - `lab/` (Playwright harness + screenshots) is gitignored and local only.
-- Increment 7 is built and verified but **not pushed to Vercel** by request.
+
+## Deployment
+PRD 13 governs: **each increment ends deployed to Vercel and verified in the
+browser before the next begins.** There is no separate sign-off step.
+
+*Correction, 2026-09-08:* a one-time instruction during Increment 7 to hold that
+increment back from Vercel was wrongly generalised into a standing "no deploy
+without sign-off" policy and written into this file and into agent memory. It
+was never a policy, and it contradicted PRD 13 the whole time. Removed. A
+specific increment can still be held back, but only when asked for that
+increment.
