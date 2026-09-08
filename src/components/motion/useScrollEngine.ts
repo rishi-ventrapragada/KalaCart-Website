@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 import { onScroll, prefersReducedMotion } from '@/app/lenis'
 
@@ -17,6 +17,17 @@ interface Subscriber {
   render: RenderFn
   /** Off-screen subscribers skip their per-frame math (PRD 10.1). */
   active: boolean
+  /**
+   * False until the IntersectionObserver has reported on this element once.
+   *
+   * The observer delivers its first entry asynchronously, a frame or more after
+   * the element is observed, so at mount every gated subscriber still reads as
+   * inactive. Skipping those would leave the scene with no transform written at
+   * all until the reader scrolls, which is the layers sitting visibly wrong on
+   * first paint. An unreported subscriber therefore renders once and lets the
+   * observer take over from there.
+   */
+  reported: boolean
 }
 
 /**
@@ -49,7 +60,10 @@ export function useScrollEngine(enabled = true) {
       (entries) => {
         for (const entry of entries) {
           for (const subscriber of current) {
-            if (subscriber.element === entry.target) subscriber.active = entry.isIntersecting
+            if (subscriber.element === entry.target) {
+              subscriber.active = entry.isIntersecting
+              subscriber.reported = true
+            }
           }
         }
       },
@@ -68,8 +82,12 @@ export function useScrollEngine(enabled = true) {
 
       for (const subscriber of current) {
         // A subscriber with no element is always live: the progress bar and the
-        // nav state are not tied to one section.
-        if (subscriber.element === null || subscriber.active) subscriber.render(state)
+        // nav state are not tied to one section. One the observer has not
+        // reported on yet is rendered too, so it is never left unpainted while
+        // the first IntersectionObserver callback is still pending.
+        if (subscriber.element === null || subscriber.active || !subscriber.reported) {
+          subscriber.render(state)
+        }
       }
     }
 
@@ -96,17 +114,31 @@ export function useScrollEngine(enabled = true) {
   /**
    * Register a scroll-reactive element. Pass `null` as the element for things
    * that are not tied to one section, such as the progress bar.
+   *
+   * Stable across renders. Subscribers hold this in an effect dependency list,
+   * so a fresh identity each render would tear down and re-register every layer
+   * on the page on any state change - and a subscriber that registers before
+   * the engine's own effect runs would be dropped rather than adopted. It reads
+   * only refs, so there is nothing for it to close over stale.
    */
-  const register = (element: HTMLElement | null, render: RenderFn): (() => void) => {
-    const subscriber: Subscriber = { element, render, active: element === null }
-    subscribers.current.add(subscriber)
-    if (element) observer.current?.observe(element)
+  const register = useCallback(
+    (element: HTMLElement | null, render: RenderFn): (() => void) => {
+      const subscriber: Subscriber = {
+        element,
+        render,
+        active: element === null,
+        reported: element === null,
+      }
+      subscribers.current.add(subscriber)
+      if (element) observer.current?.observe(element)
 
-    return () => {
-      subscribers.current.delete(subscriber)
-      if (element) observer.current?.unobserve(element)
-    }
-  }
+      return () => {
+        subscribers.current.delete(subscriber)
+        if (element) observer.current?.unobserve(element)
+      }
+    },
+    [],
+  )
 
   return { register }
 }

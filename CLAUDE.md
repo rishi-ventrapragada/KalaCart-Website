@@ -1,115 +1,66 @@
-# CLAUDE.md — Engineering Constitution
-
-This file governs how you work in this repository. It outranks habit and default behavior. Read `PRD.md` for what to build; this file is how to build it. When the two conflict, ask.
-
----
-
-## Project
-
-**KalaCart** — the buyer-facing marketplace plus admin dashboard for an Indian artisan-craft platform (SIH26090, Ministry of Social Justice & Empowerment). Companion to a separate Java/Android app built by a teammate against the **same Supabase backend**. This repo is the **website front-end**, built against a **typed mock data layer** first (see `PRD.md` §5.2).
-
-**North star: design polish.** When trading scope against quality, cut scope. A smaller site that feels refined beats a broad one that feels rough.
-
-**Stack:** Vite · React 18 · TypeScript (strict) · Tailwind CSS · React Router · Lenis · lucide-react · Recharts · react-i18next (or a typed dictionary) · deployed on Vercel.
+# KalaCart — CLAUDE.md
+*Last updated: 2026-09-08 · Owner: Rishi Ventrapragada*
 
 ---
 
-## The laws (non-negotiable)
+## A · What this folder is
+The web front-end for KalaCart — a direct-linkage buyer marketplace and administrative moderation dashboard supporting Indian artisans (SIH26090, Ministry of Social Justice & Empowerment). It is built against a typed mock data layer first and shares a Supabase backend with a companion Android app.
+Stage: active development / pre-launch.
 
-1. **File-size law.** No source file exceeds about **200 lines**. One route is one thin page component composing many small component files. When a file nears the cap, extract a component or a hook.
+## B · The Goal
+- **Why it exists:** Connect rural and traditional Indian artisans directly with conscious buyers and institutions, bypassing middlemen and preserving heritage craft.
+- **Done looks like:** A responsive, dual-themed web portal with fluid Home motion, faceted catalog filtering, artisan storytelling, direct inquiry modals, and an admin verification desk, verified across both themes.
+- **Out of scope:** Payment gateways, shopping carts, or checkout flows (linkage model only); native device features handled by the Android app.
 
-2. **The data seam.** Components never import mock data and never call Supabase directly. All data access goes through `src/lib/data/`. Both `mockProvider` and `supabaseProvider` expose the same typed signatures, so the backend can be swapped in one file later.
+## C · Stack
+- **Languages:** TypeScript (strict mode, no uninspected `any`)
+- **Frameworks:** React 18 · Vite · Tailwind CSS · React Router
+- **Libraries:** Lenis (smooth scroll) · Lucide React · Recharts · react-i18next
+- **Hosting / infra:** Vercel
+- **Key services:** Supabase (shared backend via data seam)
+- **Run locally:** `npm run dev`
+- **Key files:** `PRD.md` · `src/lib/data/` (data seam) · `src/lib/i18n/` · `src/App.tsx`
 
-3. **The theme seam.** Two first-class themes (light "Raw Cotton", dark "Gallery Wall") via CSS variables on the root element. Components use semantic Tailwind classes mapped to those variables. Never hardcode a hex value in a component. The toggle persists for the session.
+## D · Decisions
+*One line each. Date · what · why.*
+- `2026-09-07` — Typed mock data provider before Supabase to decouple UI progress from schema shifts.
+- `2026-09-07` — Inquiry linkage model over cart/checkout flow per SIH26090 artisan requirements.
+- `2026-09-07` — Strict 200-line file cap per component to enforce modularity.
+- `2026-09-07` — Semantic CSS variables for dual themes ("Raw Cotton" light, "Gallery Wall" dark).
+- `2026-09-07` — Full motion system restricted to Home route; lightweight reveals elsewhere.
+- `2026-09-08` — Hero motion is type, colour and lateral travel, not parallax depth. Layered planes read as flat and the illustrated motifs (jharokha arches, self-weaving loom, dye washes) all read as decoration laid over the page rather than as the goods. See `memory/decisions.md`.
+- `2026-09-08` — No illustrated craft motif in the hero. Texture only (a bias-woven grain), so nothing competes with the headline or dates against real product photography.
+- `2026-09-08` — Decoration yields to legibility where they overlap: the hero grain is masked away from the reading column rather than thinned globally, because thinning enough to clear AA leaves nothing visible.
+- `2026-09-08` — Buyer-facing numbers are counted from buyer-facing reads, never from `getAnalyticsSummary()`, which is an admin view including pending and rejected rows.
+- `2026-09-08` — Remote imagery renders through `RemoteImage`: the wrapper owns the geometry so a dead image cannot collapse a card's layout.
 
-4. **The i18n seam.** No user-facing string is hardcoded in a component. All copy comes from the single strings source in `lib/i18n`, referenced by key. Adding a language later must be one new file, not a refactor.
+## E · Memory Map
+What lives under `/memory`:
+- `project-brief.md` — the original kickoff and core mandates, frozen
+- `current-strategy.md` — the *now* state and immediate focus, edited weekly
+- `decisions.md` — the long-form context and reasoning behind every D entry
+- `next-actions.md` — the punch list and build sequence
+- `sessions/` — dated session wrap-ups (`YYYY-MM-DD-{short-slug}.md`)
+- `bugs-and-risks.md` — active watch-outs, mobile performance, and edge cases
 
-5. **TypeScript strict.** No `any` without a one-line comment justifying it. Every component has a typed props interface. No build warnings.
+## F · References
+- **Repo:** https://github.com/rishi-ventrapragada/KalaCart-Website
+- **PRD:** [PRD.md](file:///d:/aiml/KalaCart-Website/PRD.md)
+- **Hosting:** Vercel Dashboard
 
-6. **Three states, always.** Every data-driven view handles loading (skeletons), empty (purposeful, tells the user what to do), and error (plain, with retry). A happy-path-only screen is not done.
+## G · Project-specific overrides & Laws
+- **The 200-line law:** No source file exceeds ~200 lines. Extract subcomponents and hooks aggressively.
+- **The data seam:** Never call Supabase or import mock fixtures directly in components. All access goes through `src/lib/data/`.
+- **The theme seam:** Use semantic Tailwind tokens mapped to CSS variables. Never hardcode raw hex values in components.
+- **The i18n seam:** No hardcoded user strings. Reference copy from `src/lib/i18n/`.
+- **Three states, always:** Every data view must handle loading (skeletons), empty, and error states with retry.
+- **Quality floor:** Responsive from 360px, visible focus rings, Esc-closable modals, reduced-motion respected.
+- **Motion discipline:** Single easing curve `cubic-bezier(.22, 1, .36, 1)`. One Lenis rAF loop on Home only. Anything the engine writes per frame carries `transition: none` **explicitly** — a zero duration is not enough, because `transition-property` defaults to `all` and one inherited duration silently reintroduces the lag. Shape binary: 999px capsule controls, 18–28px card radii.
+- **Workflow & Git:** Plan before non-trivial building; inspect read-only first; verify in browser on both themes; stage explicit file paths only (never `git add .`); use heredoc commit messages.
 
-7. **Quality floor.** Responsive from 360px, visible keyboard focus, focus-trapped modals that close on Esc, `prefers-reduced-motion` respected, accessible contrast in both themes. Build this in, do not bolt it on.
-
-8. **No browser storage** except the single documented mock-auth flag.
-
----
-
-## Motion discipline
-
-- **One easing curve** for every transition on the site: `cubic-bezier(.22, 1, .36, 1)`. Define it once, reuse it. Nothing bounces or overshoots.
-- **The full motion system runs on the Home route only** (parallax hero, floating product card emerging from behind the pinned front layer, line-mask headline, scroll-progress bar, nav-to-glass). Browse and admin get only the lightweight reveal-on-scroll. Do not put parallax behind product grids or data tables.
-- **One scroll value drives everything on Home.** Read Lenis's scroll inside one requestAnimationFrame loop and fan out to every scroll-reactive element via one render function. Never attach per-component scroll listeners.
-- **Split transition from transform** on parallax elements. Position is written as an inline `transform` every frame; never put `transform` in a CSS transition on those elements, or it lags behind scroll. Scope reveal transitions to `opacity`.
-- **The accent color is for glows and highlights only** (chip dot, progress bar, hover shadow, focus ring, links). Never a large fill.
-- **Shape binary:** interactive controls are full capsules (`border-radius: 999px`); containers and cards are soft rounded rectangles (18 to 28px). Keep it strict.
-- **Reduced motion:** reveals resolve instantly, parallax freezes. Fully usable with motion off.
-
----
-
-## Workflow
-
-1. **Plan before building.** For any non-trivial task, present a short plan first (files you will create or change, the approach) and wait for a go-ahead. Do not start editing on an ambiguous request.
-
-2. **Investigate read-only first.** Before changing existing code, read it. Understand the current state before proposing edits.
-
-3. **Build in increments.** Follow the build sequence in `PRD.md` §13. Finish one increment, including its states and a browser check, before starting the next.
-
-4. **Deploy day one, verify in the browser.** The empty skeleton goes to Vercel first. After each increment, verify the change in the running app, in both themes, not by assuming it works. Undeployed or unbuilt code does not run. Check the actual rendered page before calling something done.
-
----
-
-## Design
-
-- On any visual pass, **invoke the design skill plugin** installed in the terminal, and follow it for token application, spacing, type, and critique.
-- The two themes are defined in `PRD.md` §9. Apply them through the theme seam, never as inline hex.
-- **Avoid the generic-AI craft-page tells:** cream background plus terracotta accent plus thin high-contrast serif, fade-up on every card, all-caps eyebrow labels, identical grey-shadow cards, an arrow appended to every link. Make choices grounded in the craft subject matter.
-- Spend boldness in one place per screen; keep everything around it quiet.
-
----
-
-## Git
-
-- **Stage explicit paths only.** Never `git add -A` or `git add .`. Add the specific files for the change.
-- **Small, focused commits**, one increment or one coherent change each.
-- **Commit messages with special characters** (`@`, quotes, backticks) break shell quoting. Use a heredoc rather than inline `-m`:
-  ```
-  git commit -F- <<'EOF'
-  feat: add product detail with gallery and inquiry modal
-  EOF
-  ```
-- Do not commit secrets or `.env`. The mock-auth credential is fine to commit only because it is explicitly a mock; label it as such.
-
----
-
-## Code conventions
-
-- **Naming:** PascalCase for components and their files, camelCase for functions and variables, `useX` for hooks.
-- **Styling:** Tailwind utilities mapped to theme variables. No inline hex in components. Use a `cn()` helper for conditional classes.
-- **Data functions** are async and return typed values; the mock provider simulates latency so loading states are real.
-- **Copy:** plain, active voice, sentence case, referenced by i18n key. CTAs say what happens ("Send inquiry", not "Submit"). Errors explain what happened and how to fix it, no apologies. Empty states invite an action.
-- **Money:** format rupees through one `formatInr` helper.
-
----
-
-## When to stop and ask
-
-- The request contradicts `PRD.md` or this file.
-- A data-model field or the `status` enum is ambiguous (`PRD.md` §8 and §16, shared with the teammate's schema).
-- A task would need a dependency not listed in the stack.
-- Something cannot be verified in the browser and you are unsure it works.
-
-A short question beats guessing and building the wrong thing.
-
----
-
-## Don't
-
-- Don't add state libraries, UI kits, or dependencies beyond the stack without asking.
-- Don't call Supabase directly from components (use the seam).
-- Don't hardcode strings (use i18n) or hex colors (use theme tokens).
-- Don't put the full motion system anywhere but Home.
-- Don't present the mock auth as real security.
-- Don't add any purchase, cart, or checkout flow. The model is linkage only.
-- Don't mark work done without a browser check in both themes.
-- Don't let a file cross about 200 lines.
-- Don't `git add -A`.
+## H · Memory Save Protocol
+When explicitly asked to save, store, wrap up, or remember the conversation (e.g. "save this", "wrap this up", "remember this"):
+1. Write a markdown summary to `memory/sessions/YYYY-MM-DD-{short-slug}.md` using today's date.
+2. Structure: H1 title, one-line TL;DR, **What we discussed**, **What we decided**, and **What's next**.
+3. Keep it punchy and concrete — no fluff.
+4. Never write to `memory/sessions/` without an explicit trigger from the user in chat.

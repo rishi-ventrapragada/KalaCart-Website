@@ -1,24 +1,31 @@
-import { Link } from 'react-router-dom'
+import { ArtisanRow } from '@/components/home/ArtisanRow'
+import { ClosingCta } from '@/components/home/ClosingCta'
+import { HeroSection } from '@/components/home/HeroSection'
+import { ImpactBand } from '@/components/home/ImpactBand'
+import { ProductGrid } from '@/components/home/ProductGrid'
+import { RailSection } from '@/components/home/RailSection'
 
-import { Container } from '@/components/layout/Container'
-import { buttonBase, buttonSizes, buttonVariants } from '@/components/ui/buttonStyles'
-import { useT } from '@/lib/i18n'
-import { cn } from '@/lib/utils/cn'
-
-/** Increment 0 placeholder. The full motion system lands in Increments 7-8. */
+/**
+ * Home. The one route that runs the full motion system (PRD 6, 10).
+ *
+ * The engine itself is mounted by MotionProvider in the app shell, which
+ * enables it on this path only: the navbar's glass flip and the progress bar
+ * are chrome above the router outlet and have to read the same scroll value as
+ * the hero (PRD 10.1). This route just composes the sections.
+ *
+ * Order is PRD 11.2's: the hero states what this is, the rail offers a way in
+ * by craft, the makers give it faces, the grid gives it goods, the band gives
+ * it scale, and the close asks for the one action.
+ */
 export default function Home() {
-  const t = useT()
-
   return (
-    <Container className="flex flex-col items-center gap-6 py-28 text-center">
-      <h1 className="text-4xl">{t('home.hero.title')}</h1>
-      <p className="max-w-sm text-lg leading-relaxed text-muted">{t('home.hero.subtitle')}</p>
-      <Link
-        to="/browse"
-        className={cn(buttonBase, buttonVariants.primary, buttonSizes.md)}
-      >
-        {t('home.hero.cta')}
-      </Link>
-    </Container>
+    <>
+      <HeroSection />
+      <RailSection />
+      <ArtisanRow />
+      <ProductGrid />
+      <ImpactBand />
+      <ClosingCta />
+    </>
   )
 }

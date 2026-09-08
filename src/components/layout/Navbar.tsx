@@ -1,10 +1,14 @@
 import { Menu, Search } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
 import { Link, NavLink } from 'react-router-dom'
+
+import { prefersReducedMotion } from '@/app/lenis'
 
 import { Container } from '@/components/layout/Container'
 import { MobileMenu } from '@/components/layout/MobileMenu'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
+import { useScrollRegister } from '@/components/motion/useScrollRegister'
 import { useT } from '@/lib/i18n'
 import { cn } from '@/lib/utils/cn'
 
@@ -15,18 +19,72 @@ const linkClasses = ({ isActive }: { isActive: boolean }): string =>
   )
 
 /**
+ * Where the nav flips from gradient to frosted glass (PRD 10.5 asks for ~40px).
+ *
+ * Two thresholds, not one. A single boundary makes a scroll parked exactly on
+ * it strobe between the two states as the smoothed value jitters either side;
+ * the gap means the flip has to be committed to before it reverses.
+ */
+const GLASS_ON = 40
+const GLASS_OFF = 32
+
+/**
  * Global chrome per PRD 11.0: logo to Home, a Browse link, a search entry, the
  * theme toggle, a discreet Admin link, collapsing to a menu on small screens.
  *
- * The nav-to-glass transition on scroll is part of the Home motion system and
- * lands in Increment 7.
+ * On Home it also carries the PRD 10.5 chrome: a soft top-down gradient at
+ * rest, becoming frosted glass after about 40px of scroll through a single
+ * class flip driven by the one engine. Off Home there is no engine, so the nav
+ * renders in its solid resting state and never subscribes to anything - which
+ * is what keeps Browse and admin free of the motion system.
  */
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [glass, setGlass] = useState(false)
+  const register = useScrollRegister()
   const t = useT()
 
+  useEffect(() => {
+    if (!register) return
+
+    // The engine calls this every frame, so the current state is tracked in a
+    // local rather than read from React: a stale closure over `glass` would
+    // compare against the wrong threshold, and depending on `glass` would tear
+    // the subscription down and rebuild it on each flip.
+    let on = false
+
+    return register(null, ({ y }) => {
+      const next = on ? y > GLASS_OFF : y > GLASS_ON
+      if (next === on) return
+      on = next
+      setGlass(next)
+    })
+  }, [register])
+
+  // The gradient-at-rest state belongs to the Home motion system, which is the
+  // only place something is designed to scroll underneath it. Off Home there is
+  // no engine to ever flip it to glass, so a transparent nav would leave bare
+  // labels sitting over passing content: those routes keep the solid chrome.
+  //
+  // Reduced motion gets the same treatment for the same reason. The engine
+  // renders once and stops there, so the flip would never fire and the nav
+  // would stay transparent over everything that scrolls beneath it. A frosted
+  // nav is not motion, so pinning it on costs nothing and keeps the chrome
+  // legible (PRD 10.7: usable with motion off, no exceptions).
+  const onMotionRoute = register !== null && !prefersReducedMotion()
+
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-canvas">
+    <header
+      data-glass={glass ? '' : undefined}
+      className={cn(
+        'sticky top-0 z-40 border-b',
+        // Colour and blur only. Never geometry, and never `transition: all`.
+        'transition-[background-color,border-color,backdrop-filter] duration-300 ease-site',
+        glass || !onMotionRoute
+          ? 'border-line-strong bg-glass backdrop-blur-md'
+          : 'border-transparent bg-gradient-to-b from-canvas to-transparent',
+      )}
+    >
       <Container>
         <nav aria-label={t('nav.primary')} className="flex h-[4.5rem] items-center gap-6">
           <Link to="/" className="font-display text-xl tracking-[-0.02em] text-ink">

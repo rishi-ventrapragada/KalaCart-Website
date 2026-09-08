@@ -1,0 +1,63 @@
+# Architectural & Engineering Decisions
+
+*Expanded reasoning behind Section D of CLAUDE.md.*
+
+- **2026-09-07 · Typed Data Seam over Direct Supabase Calls**
+  - *Context:* Companion Android app is simultaneously modifying the shared schema.
+  - *Decision:* Build UI against `src/lib/data/` interfaces implemented by `mockProvider` with latency simulation.
+  - *Why:* Decouples frontend development from backend deploy cycles; prevents schema instability from breaking UI work.
+
+- **2026-09-07 · Inquiry Linkage over Cart/Checkout Flow**
+  - *Context:* Indian artisans often deal with made-to-order, custom, or bulk craft requests.
+  - *Decision:* Omit cart and payment gateways. Use verified inquiry modal and direct communication channels.
+  - *Why:* Matches the SIH26090 requirement and avoids regulatory/logistical overhead of direct e-commerce transactions.
+
+- **2026-09-07 · 200-Line File Limit & Strict Composition**
+  - *Context:* Large monolitihic components degrade maintainability and challenge LLM context windows.
+  - *Decision:* Keep all source files under ~200 lines by aggressively extracting hooks and subcomponents.
+  - *Why:* Keeps files focused, testable, and prevents context degradation during development.
+
+- **2026-09-07 · Scoped Motion System (Home Route Only)**
+  - *Context:* Heavy scroll-driven animations can slow down catalog browsing and administrative work.
+  - *Decision:* Run the full motion system and Lenis-driven progress on Home only. Rest of site uses lightweight scroll reveals.
+  - *Why:* Preserves 60fps performance and high usability across data-dense views.
+
+- **2026-09-08 · Hero Motion is Type, Colour and Lateral Travel, not Parallax Depth** *(Increment 7)*
+  - *Context:* PRD 10.2 specified a layered parallax hero: tinted backdrop, far and mid craft-silhouette planes, a floating product-card mockup, and a pinned front silhouette the card emerged from behind (the "front-occlusion signature move"). It was built in full and verified at 284 assertions.
+  - *What happened:* Rejected on review. Three further directions were built and shown:
+    1. **Layered jharokha arches** — rejected. The motif read as Rajasthani *architecture*, but the product is craft *objects*; it was heritage-generic rather than about the goods. The owner also removed the floating card, which took the front-occlusion effect with it, leaving four planes drifting ~77px — technically correct and emotionally flat.
+    2. **The loom** (warp threads struck on load, weft drawn across by scroll, cloth building under the copy) — rejected. The mechanic worked, but at hero scale it read as graph paper rather than as cloth.
+    3. **Kinetic type + material field + craft rail** — accepted.
+  - *Decision:* The hero's motion is the headline assembling, a dye underline drawing under one marked word, and a category rail travelling laterally against the vertical scroll. No depth planes.
+  - *Why:* Four planes sliding at slightly different rates is the most conservative device in the scroll vocabulary — nothing *happens*, you only notice it if you look for it. Lateral travel moves in a direction the reader is not producing themselves, which is what actually reads as alive. It also uses the dye palette (PRD 9.3) that was otherwise sitting unused in the token file.
+
+- **2026-09-08 · No Illustrated Craft Motif in the Hero** *(Increment 7)*
+  - *Context:* PRD 10.2 asked to "choose one craft motif and commit" — block-print border, jharokha arches, or pottery/loom shapes.
+  - *Decision:* None of them. The hero ground is texture only: a bias-woven grain at 45°/135°.
+  - *Why:* Every illustrated option tried read as decoration laid over the page rather than as the subject. A drawn motif also dates badly against the real product photography arriving in Increments 8 and 10, and competes with the Fraunces headline that PRD 9.4 makes the page's voice. Texture gives the canvas a surface without introducing a subject that argues with the type.
+  - *Also rejected under this heading:* large blurred dye washes. At hero scale a soft colour bloom reads as a **lighting effect sitting on top of the page**, not as material, and it dirtied the canvas either side of the copy.
+
+- **2026-09-08 · Decoration Yields to Legibility Where They Overlap** *(Increment 7)*
+  - *Context:* Making the woven grain visible enough to read as texture pushed `muted` body copy to ~3.3:1 in light and ~3.9:1 in dark — both under the 4.5:1 AA floor the Increment 5 contrast pass established.
+  - *Decision:* Mask the grain away from the reading column rather than thinning it globally. Full strength across the open side of the frame, faded to nothing under the copy.
+  - *Why:* Thinning the threads far enough to clear AA everywhere left nothing visible at all — the fix destroyed the feature. Masking keeps both: the texture reads where there is nothing to read, and yields exactly where words are. Measured after: 4.59:1 light, 6.24:1 dark for body copy; 10.09:1 for the headline.
+
+- **2026-09-08 · Explicit `transition: none` on Every Scroll-Driven Property** *(Increment 7)*
+  - *Context:* PRD 10.2 warns to split `transition` from `transform`. Verification found `transition-property: all` computed on the rail and the blooms.
+  - *Decision:* Scroll-driven elements declare `transition: none` explicitly, never merely inherit a zero duration.
+  - *Why:* The CSS initial value for `transition-property` is `all`. The duration happened to be `0s`, so nothing lagged *yet* — but any inherited duration anywhere above those elements would have silently reintroduced a full-beat lag behind the scroll, and it would have been very hard to trace back.
+
+- **2026-09-08 · Public Numbers Come From Buyer Reads, Not the Admin Summary** *(Increment 8)*
+  - *Context:* The Home impact band initially showed `getAnalyticsSummary().totalProducts`, which is 30. Browse will show the 23 approved products.
+  - *Decision:* Count products and traditions from `getProducts()` (approved only); take only the inquiry total from the summary.
+  - *Why:* The summary is an admin view and includes pending and rejected rows. A public band asserting 30 crafts next to a catalogue of 23 is a factual error, and on a ministry programme page that is worse than a slow extra request. Applies to any future public stat.
+
+- **2026-09-08 · Remote Images Cannot Break a Card** *(Increment 8)*
+  - *Context:* Product and artisan imagery is served from a remote host (picsum now, Supabase Storage later), so a 404 or a blocked request is normal rather than exceptional. A bare `<img>` that fails collapses to its alt text and drags the card's layout with it.
+  - *Decision:* All remote imagery renders through `RemoteImage`. The wrapper owns the aspect ratio and paints a tonal placeholder; the image sits on top and is removed on error.
+  - *Why:* Verified by blocking the image host entirely — all 8 cards keep their geometry, titles stay readable, no horizontal overflow. The placeholder also shows while the image is in flight, so there is no layout shift on arrival.
+
+- **2026-09-08 · Rail Travel Maps to Real Overflow, Not a Fixed Fraction** *(Increment 8)*
+  - *Context:* The craft rail used a fixed fraction of its overflow, tuned at 1280px. At 360px the rail is over four viewports wide: the first card started off-screen to the right (x=468) and the last was never reachable.
+  - *Decision:* Map the section's progress onto the rail's actual overflow, clamped, so the first card is flush on entry and the last is reached on exit at any width.
+  - *Why:* A phone reader otherwise arrives at an apparently empty strip and can never see the later crafts. Now asserted in the harness at both widths so it cannot regress.

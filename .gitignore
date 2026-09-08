@@ -33,3 +33,6 @@ dist-ssr
 
 .vercel
 .env*
+
+# Local verification harness and screenshots (Increment 7). Not part of the app.
+lab

@@ -156,7 +156,7 @@ Every data-driven view handles loading (skeletons, never a bare spinner on a bla
 
 Design polish is the goal, so two rules govern where visual effort concentrates:
 
-1. **Motion is scoped by surface.** The full scroll-motion system (§10) runs on the **home page only**. Browse and admin use lightweight reveal-on-scroll and nothing heavier, so product photos and data tables stay fast and legible. Applying parallax everywhere would fight the products.
+1. **Motion is scoped by surface.** The full scroll-motion system (§10) runs on the **home page only**. Browse and admin use lightweight reveal-on-scroll and nothing heavier, so product photos and data tables stay fast and legible. Applying the full motion system everywhere would fight the products.
 2. **Two themes, both first-class.** Light "Raw Cotton" and dark "Gallery Wall" are both fully designed, not one dimmed into the other (§9). A visible toggle switches them and the choice persists for the session.
 
 ---
@@ -325,21 +325,25 @@ Adapted from a reference landing page. The whole thing is driven by one smoothed
 
 ### 10.1 The engine
 - Lenis provides an inertia-smoothed virtual scroll, initialized once in the app shell.
-- On the Home route, a single `useScrollEngine` reads Lenis's scroll value inside one requestAnimationFrame loop and calls one `render(y)` that updates every scroll-reactive element: parallax layers, the progress bar, and nav state.
+- On the Home route, a single `useScrollEngine` reads Lenis's scroll value inside one requestAnimationFrame loop and calls one `render(y)` that updates every scroll-reactive element: the craft rail, the progress bar, and nav state.
+- `useScrollEngine` is mounted by `MotionProvider` in the app shell, enabled on `/` only, and publishes its `register` through context. It sits in the shell rather than inside the Home route because the navbar and progress bar are chrome above the router outlet and must read the same scroll value as the hero (a provider inside Home would be a descendant of the nav and invisible to it).
 - Sections off-screen skip their per-frame math (IntersectionObserver gate with a generous rootMargin so state warms up before entering view).
 
-### 10.2 The parallax hero (signature effect)
-Build a depth scene from separate layers, each with a numeric drift rate as a data attribute, positioned absolutely, centered with `left:50%; translateX(-50%)`, sized larger than the container:
-- A soft gradient backdrop tinted by the theme accent (no drift).
-- Far and mid craft-silhouette layers that drift slowly (far slowest).
-- A floating product-card mockup at mid-depth that drifts slightly.
-- A front craft-silhouette layer that is **pinned** (rate 0) and sits in front of the floating card, so the card emerges from behind it as you scroll and gets clipped again. This front-occlusion is the signature move.
-- Fade the oversized layers into the page background at the section's bottom edge with a gradient overlay so no hard clip line shows.
+### 10.2 The hero (signature effect)
+
+**Revised Increment 7.** The original spec here was a layered parallax depth scene: a tinted backdrop, far and mid craft-silhouette layers, a floating product-card mockup, and a pinned front silhouette the card emerged from behind. That was built in full, reviewed, and rejected. Two further directions were built and reviewed before the current one was accepted. The history and reasoning are in `memory/decisions.md`; what follows is what the hero actually is.
+
+The hero's motion is **type, colour and lateral travel**, not depth. Nothing slides underneath the copy, so the headline is never read against a moving ground.
+
+- **Kinetic headline.** The Fraunces headline assembles from its line masks (10.4), then one marked word carries a dye underline that draws itself in beneath it via `transform: scaleX()` from a left origin, timed to land after the second line has arrived. The word is marked in the strings file with an `{accent}` placeholder, not in markup, so a translator can move the emphasis.
+- **The material field.** A woven paper grain, and nothing else. Two thread families on the bias at 45° and 135°, at deliberately different pitches (7px against 9px) so their crossings drift rather than forming a regular lattice. Light picks the weave out in `ink`; dark picks it out thin in `accent` (brass), because on charcoal a darker thread would vanish. It is texture at the paper's own scale, never a light source.
+- **The weave yields to the words.** At full strength the crossings drop `muted` body copy to about 3.3:1 in light, under the AA floor the Increment 5 contrast pass established. Thinning the threads far enough to fix that leaves nothing visible, so the grain is masked away from the reading column instead: full strength across the open side of the frame, faded to nothing under the copy. Measured after the fix: 4.59:1 light, 6.24:1 dark for body text; 10.09:1 for the headline.
+- **The craft rail** (see 10.9) provides the page's lateral movement.
 
 Implementation notes that matter:
-- Split `transition` from `transform`. The parallax writes an inline `transform` every frame; never put `transform` in a CSS `transition` on those elements or it lags a full beat behind scroll. Scope any reveal transition to `opacity` only.
-- Give each drifting layer `will-change: transform`.
-- Choose one craft motif and commit (block-print border pattern, temple or jharokha arches, or a row of pottery and loom shapes). Consistency reads as intent.
+- Split `transition` from `transform`. Anything the engine writes per frame (the rail's transform, the progress bar's `scaleX`) carries `transition: none` **explicitly**, not merely a zero duration: the CSS initial value for `transition-property` is `all`, so leaving it unset means one inherited duration anywhere above it silently reintroduces the lag. Scope reveal transitions to `opacity` only.
+- Give scroll-driven elements `will-change: transform`.
+- No illustrated craft motif. Three were tried (jharokha arches, a self-weaving loom, and blurred dye washes) and all three were rejected: the architecture read as heritage-generic rather than as the goods, and the washes read as a lighting effect laid over the page rather than as material. The weave is texture, not illustration.
 
 ### 10.3 Reveal system
 One reusable reveal: elements start at `opacity: 0; translateY(18px)` and resolve to `opacity: 1; translateY(0)` when revealed, using the one easing curve, staggered by a `data-delay`. Used on hero elements (badge, headline, subhead, button cascading about 80ms apart) and on section cards site-wide.
@@ -352,13 +356,27 @@ The Fraunces hero headline wraps each line in an `overflow: hidden` mask with an
 - Progress bar: a 2px line pinned to the very top, glowing in the theme accent, scaled horizontally by scroll progress via `transform: scaleX(p)` from a left origin (not width, so it stays GPU-composited).
 
 ### 10.6 Closing CTA bookend
-The closing CTA on Home reuses the same craft-scene layers as the hero, reversed, as a visual bookend into the footer.
+The closing CTA on Home carries the same material field as the hero, so the page opens and closes on the same ground. What makes it a bookend rather than a repeat is the copy: the hero is anchored left and argues, the close is centred and invites.
 
 ### 10.7 Reduced motion
-Under `prefers-reduced-motion: reduce`, all reveals resolve instantly to their end state and every parallax transform is frozen. The page is fully usable with motion off.
+Under `prefers-reduced-motion: reduce`, all reveals resolve instantly to their end state and every scroll-driven transform is frozen. The page is fully usable with motion off. Three consequences that are easy to miss and are all required:
+
+- **The craft rail becomes a real scroll region.** With the drift off, its later cards would otherwise be parked off-screen and unreachable, so it takes `overflow-x: auto` with snap points.
+- **The nav is pinned frosted.** The engine renders once and stops, so the 40px glass flip never fires; a transparent nav would leave bare labels over whatever scrolls beneath them. A frosted nav is not motion, so pinning it on costs nothing.
+- **The line-mask resolves.** Masks neutralised so no stale transform can leave a headline line hidden.
 
 ### 10.8 Elsewhere
-Browse and admin use only the `useReveal` IntersectionObserver reveal. No parallax, no progress bar, no line-mask. Legibility and speed first.
+Browse and admin use only the `useReveal` IntersectionObserver reveal. No material field, no craft rail, no progress bar, no line-mask. Legibility and speed first.
+
+### 10.10 Public numbers vs admin numbers (added Increment 8)
+Anything a buyer-facing surface counts must be counted from the buyer-facing reads, not from `getAnalyticsSummary()`. The summary is an **admin** view: `totalProducts` includes pending and rejected rows, so a public band claiming 30 crafts beside a catalogue showing 23 is simply wrong. The Home impact band therefore derives its product and tradition counts from `getProducts()` (approved only) and takes only the inquiry total from the summary.
+
+### 10.9 The craft rail (added Increment 7)
+The page's lateral move, and the browse-by-craft strip 11.2 asks for. A row of dye-coded category cards that travels sideways as the reader scrolls down.
+
+- Vertical scroll reads as an argument being made; lateral travel reads as range, as things to choose between. Running a rail sideways while the page runs down is the cheapest way to make a page feel alive, because the motion is in a direction the reader is not producing themselves.
+- Travel maps the section's progress onto the rail's **real overflow**, so the first card is flush when the section enters and the last is reached by the time it leaves. A fixed fraction of the overflow fails on a phone, where the rail is several viewports wide: the first card starts off-screen to the right and the last is never reachable. Overflow is measured against the **section's** width, not the rail's own. The rail is sized to its content (`w-max`), so its `scrollWidth` and `clientWidth` are always equal and an overflow computed from them is always zero — the rail sits still while the page scrolls past it. This was a real dead-scroll bug caught in verification.
+- Cards come through the data seam (`getCategories`), never from a fixture, and handle loading and error states. The dye tone lives in the card's border and dot, never in its label (Increment 5 contrast rule).
 
 ---
 
@@ -388,7 +406,7 @@ Navbar (logo to Home, links to Browse, a search entry, the theme toggle, a discr
 
 ### 11.2 Home (`/`)
 Purpose: make a buyer immediately understand this is where they find handmade goods directly from Indian artisans, and feel the polish. Full motion system from §10.
-Sections top to bottom: parallax hero (badge, line-mask headline, subhead, capsule "Browse crafts" button, floating product card emerging from behind the front layer), browse-by-craft category strip (dye-coded chips, reveal-staggered), featured artisans row (minimal cards), featured products grid (about 8 approved products), a quiet how-it-works or impact band, closing CTA bookend.
+Sections top to bottom: hero (badge, line-mask headline with the dye-underlined accent word, subhead, capsule "Browse crafts" button, over the woven material field), browse-by-craft rail (dye-coded cards travelling laterally on scroll, see 10.9), featured artisans row (minimal cards), featured products grid (about 8 approved products), a quiet how-it-works or impact band, closing CTA bookend.
 States: loading (skeleton hero and grids), error (retry).
 
 ### 11.3 Browse and search (`/browse`)
@@ -451,8 +469,8 @@ Each increment ends deployed to Vercel and verified in the browser before the ne
 | 4 | `ui/` primitives + layout chrome (Navbar, Footer, Container) | Buttons, inputs, skeletons, empty state, both themes |
 | 5 | Design pass via the design skill, lock tokens and type | Palette, type, spacing applied to primitives in both themes |
 | 6 | Motion primitives: Lenis shell, useReveal, useScrollEngine | Reveals work site-wide; engine ready for Home |
-| 7 | Home hero: parallax layers, floating card, line-mask headline, progress bar, nav glass | Full hero motion in both themes, reduced-motion frozen |
-| 8 | Home sections + closing CTA bookend | All sections render from mock data with all states |
+| 7 | Home hero: material field, line-mask headline with accent underline, craft rail, progress bar, nav glass | **Done.** Full hero motion in both themes, reduced-motion frozen, 254 assertions green |
+| 8 | Home sections: featured artisans, featured products, impact band | **Done.** All render from the seam with loading, empty and error states; 352 assertions green |
 | 9 | Browse and search (URL-driven filters, reveal-only) | Filtering, sorting, search work and are shareable |
 | 10 | Product detail + ImageGallery + InquiryModal + WhatsApp | View a product, browse the gallery, send a mock inquiry, open WhatsApp |
 | 11 | Artisan profile (minimal) | Header plus their products render |
@@ -474,7 +492,7 @@ Only after all 16: revisit wiring real Supabase (separate task).
 - Full motion only on Home; browse and admin are reveal-only.
 - Responsive from 360px, no horizontal scroll.
 - Visible keyboard focus everywhere; modals trap focus and close on Esc.
-- `prefers-reduced-motion` respected: reveals instant, parallax frozen.
+- `prefers-reduced-motion` respected: reveals instant, every scroll-driven transform frozen, the craft rail still reachable by hand.
 - No hardcoded user-facing strings; all copy from the i18n source.
 - No `localStorage` or `sessionStorage` beyond the documented mock-auth flag.
 - Runs on the mock provider with zero backend dependencies.

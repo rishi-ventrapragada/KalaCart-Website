@@ -26,6 +26,27 @@
   --accent-deep: #1b2a4a;
   --secondary: #b8862f;
 
+  /*
+   * Frosted-nav fill (PRD 10.5). A translucent canvas, not a new hue: the nav
+   * has to read as the page surface with the content blurred behind it. Alpha
+   * is high enough that nav labels keep their AA contrast over any hero layer
+   * scrolling underneath, which a lighter frost would not guarantee.
+   */
+  --glass: rgba(245, 240, 230, 0.82);
+
+  /*
+   * The woven grain (hero and closing bookend).
+   *
+   * Light leans on ink: on a warm cream canvas a darker thread is what makes a
+   * weave visible at all, and anything lighter disappears into the paper. These
+   * are deliberately stronger than the first pass, which was too faint to read
+   * as texture.
+   */
+  --grain-warp: color-mix(in srgb, var(--ink) 11%, transparent);
+  --grain-weft: color-mix(in srgb, var(--ink) 8%, transparent);
+  /* Thread weight. Kept under a pixel so the weave stays texture, not pattern. */
+  --grain-thread: 0.75px;
+
   /* The one easing curve for every transition on the site (PRD 9.7). */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -78,6 +99,18 @@
   --accent: #c9922b;
   --accent-deep: #a8761f;
   --secondary: #a63a3a;
+  --glass: rgba(23, 19, 15, 0.82);
+
+  /*
+   * Dark inverts the logic: ink is the light value here, so a darker thread
+   * would vanish into the charcoal. The weave is picked out in the theme's own
+   * brass instead, which is what a gallery light does to cloth. Held thin and
+   * low so it is texture caught at an angle rather than a pattern competing
+   * with the type - the accent may glow, never fill (PRD 9.6).
+   */
+  --grain-warp: color-mix(in srgb, var(--accent) 14%, transparent);
+  --grain-weft: color-mix(in srgb, var(--accent) 10%, transparent);
+  --grain-thread: 0.6px;
 }
 
 @theme inline {
@@ -90,6 +123,7 @@
   --color-accent: var(--accent);
   --color-accent-deep: var(--accent-deep);
   --color-secondary: var(--secondary);
+  --color-glass: var(--glass);
 
   /* Category dye tones (PRD 9.3), theme-independent. */
   --color-indigo: #2e4374;
@@ -179,8 +213,8 @@ p {
  *
  * The transition is scoped to `opacity` only, never `transform` (PRD 10.2).
  * Transform is written directly by the class flip here, and by inline styles on
- * the Home parallax layers in Increment 7. Putting transform in a transition on
- * a scroll-driven element makes it lag a beat behind the scroll.
+ * the Home craft rail. Putting transform in a transition on a scroll-driven
+ * element makes it lag a beat behind the scroll.
  */
 [data-reveal] {
   opacity: 0;
@@ -204,6 +238,187 @@ p {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+}
+
+/*
+ * HEADLINE LINE-MASK (PRD 10.4).
+ *
+ * Each line is an overflow:hidden mask whose inner span starts translated 110%
+ * down and slides up on load. The mask is padded and the line-height held at 1
+ * because clip is relative to the border box, not the ink: a mask tight to the
+ * line box shears the tails off g, y, p and j, which is the most common way
+ * this effect looks broken.
+ */
+.line-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+
+.line-mask > span {
+  display: block;
+  transform: translateY(110%);
+  transition: transform 900ms var(--ease);
+  transition-delay: var(--line-delay, 0ms);
+}
+
+.line-mask[data-revealed] > span {
+  transform: translateY(0);
+}
+
+/*
+ * Reduced motion: the line resolves instantly to its end state, with the mask
+ * neutralised so a stale transform cannot leave a line hidden (PRD 10.7).
+ */
+@media (prefers-reduced-motion: reduce) {
+  .line-mask > span {
+    transform: none;
+    transition: none;
+  }
+}
+
+/*
+ * THE MATERIAL FIELD (hero ground).
+ *
+ * A woven paper grain and nothing more. The large blurred dye washes this once
+ * carried were removed at the owner's request: at that size they read as a
+ * light source laid over the page rather than as material.
+ */
+.material-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* Defaults so the field is correct before the first engine frame, and stays
+     correct under reduced motion where no frame is ever written. */
+  --field-p: 0;
+  --field-drift: 0px;
+}
+
+/*
+ * The grain: a fine woven tooth, built from two crossed repeating gradients
+ * rather than an image, so it costs no request and recolours with the theme.
+ */
+.material-field__grain {
+  position: absolute;
+  inset: 0;
+  /*
+   * The weave thins out behind the copy.
+   *
+   * At full strength the crossings drop `muted` body text to about 3.3:1 in
+   * light, under the 4.5:1 AA floor, and thinning the threads far enough to fix
+   * that leaves nothing visible anywhere. So the texture is masked away from
+   * the reading column instead: full strength across the open right of the
+   * frame, faded to nothing under the words. Decoration yields to legibility
+   * exactly where they overlap, and nowhere else.
+   */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.25) 26%,
+    rgba(0, 0, 0, 1) 52%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.25) 26%,
+    rgba(0, 0, 0, 1) 52%
+  );
+  /*
+   * A criss-cross weave on the bias: two thread families at 45 and 135 degrees
+   * rather than upright and flat. On the diagonal the crossings never line up
+   * with the edges of the frame or with the baseline of the type, so the
+   * texture reads as cloth held at an angle instead of as ruled graph paper.
+   *
+   * The two families are deliberately not the same pitch (7px against 9px), so
+   * their intersections drift rather than forming a regular lattice, which is
+   * what keeps it looking woven rather than printed.
+   */
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      var(--grain-warp) 0 var(--grain-thread),
+      transparent var(--grain-thread) 7px
+    ),
+    repeating-linear-gradient(
+      135deg,
+      var(--grain-weft) 0 var(--grain-thread),
+      transparent var(--grain-thread) 9px
+    );
+}
+
+/*
+ * THE ACCENT WORD.
+ *
+ * One word in the headline carries a dye underline that draws itself in after
+ * the line-mask has landed. `transform: scaleX` from a left origin, so it is
+ * composited and never touches layout.
+ */
+.accent-word {
+  position: relative;
+  white-space: nowrap;
+}
+
+.accent-word::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.06em;
+  height: 0.09em;
+  border-radius: 999px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 760ms var(--ease);
+  /* Lands after the second headline line has finished arriving. */
+  transition-delay: 620ms;
+}
+
+.line-mask[data-revealed] .accent-word::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accent-word::after {
+    transform: scaleX(1);
+    transition: none;
+  }
+}
+
+/*
+ * THE CRAFT RAIL.
+ *
+ * The transform is written per frame by the scroll engine, so no transition
+ * touches it (PRD 10.2). Only colour transitions, and those live on the cards.
+ */
+.craft-rail {
+  will-change: transform;
+  /* The transform is scroll-driven, so nothing may transition it (PRD 10.2).
+     The cards inside carry their own colour transitions. */
+  transition: none;
+}
+
+/*
+ * Reduced motion: the drift stops, so the rail must become reachable by hand
+ * or everything past the fold is unreachable. It turns into a native
+ * horizontally scrollable region with snap points (PRD 10.7: usable with
+ * motion off, no exceptions).
+ */
+@media (prefers-reduced-motion: reduce) {
+  .craft-rail {
+    transform: none !important;
+    will-change: auto;
+    overflow-x: auto;
+    max-width: 100%;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .craft-rail > * {
+    scroll-snap-align: start;
   }
 }
 
