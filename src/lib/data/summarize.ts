@@ -31,17 +31,40 @@ export function summarize(store: Store): AnalyticsSummary {
   }
 }
 
-/** Chronological, one entry per month an artisan actually signed up in. */
+/**
+ * Chronological, one entry per month from the first signup to the last.
+ *
+ * Months nobody joined in are included with a count of zero, so the series is
+ * a continuous timeline rather than a list of the months that happened to have
+ * activity. A consumer plotting the array by index would otherwise space a
+ * three-month gap the same as a one-month step and misdate every point after
+ * it - and the mock store has two such gaps.
+ *
+ * The gap filling belongs here, not in the chart layer, because this is where
+ * the real `Date` keys still exist. Reconstructing them from the formatted
+ * label is a trap: `Intl` renders September as "Sept" in some ICU builds and
+ * "Sep" in others, so a reverse-parser passes locally and fails in a browser.
+ */
 function signupsByMonth(artisans: Artisan[]): { month: string; count: number }[] {
   const counts = new Map<number, number>()
 
   for (const artisan of artisans) {
     const date = new Date(artisan.createdAt)
-    const key = Date.UTC(date.getUTCFullYear(), date.getUTCMonth())
+    // Months since 1970, so consecutive months are consecutive integers.
+    const key = date.getUTCFullYear() * 12 + date.getUTCMonth()
     counts.set(key, (counts.get(key) ?? 0) + 1)
   }
 
-  return [...counts.entries()]
-    .sort(([a], [b]) => a - b)
-    .map(([key, count]) => ({ month: MONTH_LABEL.format(new Date(key)), count }))
+  const keys = [...counts.keys()].sort((a, b) => a - b)
+  const first = keys[0]
+  const last = keys[keys.length - 1]
+  if (first === undefined || last === undefined) return []
+
+  const series: { month: string; count: number }[] = []
+  for (let key = first; key <= last; key += 1) {
+    const date = new Date(Date.UTC(Math.floor(key / 12), key % 12))
+    series.push({ month: MONTH_LABEL.format(date), count: counts.get(key) ?? 0 })
+  }
+
+  return series
 }

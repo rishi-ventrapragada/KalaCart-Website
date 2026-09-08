@@ -15,7 +15,7 @@ Stage: active development / pre-launch.
 ## C · Stack
 - **Languages:** TypeScript (strict mode, no uninspected `any`)
 - **Frameworks:** React 18 · Vite · Tailwind CSS · React Router
-- **Libraries:** Lenis (smooth scroll) · Lucide React · Recharts · react-i18next
+- **Libraries:** Lenis (smooth scroll) · Lucide React · react-i18next. Admin charts are hand-rolled SVG, not Recharts (see §D).
 - **Hosting / infra:** Vercel
 - **Key services:** Supabase (shared backend via data seam)
 - **Run locally:** `npm run dev`
@@ -34,6 +34,7 @@ Stage: active development / pre-launch.
 - `2026-09-08` — Buyer-facing numbers are counted from buyer-facing reads, never from `getAnalyticsSummary()`, which is an admin view including pending and rejected rows.
 - `2026-09-08` — Remote imagery renders through `RemoteImage`: the wrapper owns the geometry so a dead image cannot collapse a card's layout.
 - `2026-09-08` — Mock behaviour is disclosed in the UI, not just in code comments. A demo reviewer takes on-screen copy at face value and cannot read a comment.
+- `2026-09-08` — Admin charts are hand-rolled SVG, not Recharts. Supersedes the Recharts mention in §C and PRD 11.8. Two charts on one gated page do not justify ~90 kB gzipped of D3, and inline SVG reads the theme's CSS variables and category dye tones directly instead of needing a theme-reading wrapper around `ResponsiveContainer`. See `memory/decisions.md`.
 
 ## E · Memory Map
 What lives under `/memory`:

@@ -159,13 +159,46 @@ export const admin = {
       failedToast: 'Could not save that change. {name} is unchanged.',
     },
 
-    /*
-     * Placeholder surface. The analytics charts are Increment 15; the tab says
-     * so rather than showing an empty panel that looks broken.
-     */
-    placeholder: {
-      analyticsTitle: 'Analytics',
-      analyticsBody: 'Stat cards and charts are built in Increment 15.',
+    analytics: {
+      title: 'Analytics',
+      intro: 'The programme in numbers, across every artisan on the platform.',
+
+      /*
+       * Card labels name the ADMIN scope out loud. `totalProducts` counts
+       * pending and rejected listings too, so a bare "Listings" beside a
+       * catalogue showing fewer would read as a contradiction - the same trap
+       * the Home impact band avoided in Increment 8 (CLAUDE.md section D).
+       */
+      totalArtisans: 'Artisans registered',
+      approvedArtisans: 'Visible to buyers',
+      pendingArtisans: 'Awaiting review',
+      totalProducts: 'Listings submitted',
+      totalInquiries: 'Buyer inquiries',
+      adminScopeNote:
+        'Every figure here counts all submissions, including those pending and rejected. Buyers see only approved artisans and listings.',
+
+      byCategoryTitle: 'Artisans by craft',
+      byCategoryCaption: 'Where the platform is strong, and where it needs outreach.',
+      byCategoryColLabel: 'Craft',
+      byCategoryColValue: 'Artisans',
+
+      /*
+       * The heading says "on the platform", not "signups", because the line is
+       * the running total rather than the monthly figure - a chart titled
+       * signups showing 9 at the right edge would be off by a factor of nine.
+       */
+      overTimeTitle: 'Artisans on the platform',
+      overTimeCaption: 'Cumulative total by month, since the first registration.',
+      overTimeColMonth: 'Month',
+      overTimeColAdded: 'Joined',
+      overTimeColTotal: 'Total',
+      /** {count} and {month} are replaced at call time. */
+      overTimePoint: '{count} by {month}',
+
+      /** Names the table that carries each chart's numbers for a screen reader. */
+      tableLabel: '{title}, as a table',
+
+      error: 'Could not load the analytics.',
     },
   },
 } as const
