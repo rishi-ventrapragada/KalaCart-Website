@@ -1,4 +1,4 @@
-import { ProductCard } from '@/components/home/ProductCard'
+import { ProductCard } from '@/components/product/ProductCard'
 import { SectionHeader } from '@/components/home/SectionHeader'
 import { Container } from '@/components/layout/Container'
 import { Reveal } from '@/components/motion/Reveal'

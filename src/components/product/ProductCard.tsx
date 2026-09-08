@@ -20,9 +20,10 @@ interface ProductCardProps {
 }
 
 /**
- * One product. THE reusable card: Browse (Increment 9), product detail's
- * related row and the artisan profile all render this, so it takes a Product
- * and nothing page-specific.
+ * One product. THE reusable card: Home's featured grid, Browse's results, and
+ * later the artisan profile all render this, so it takes a Product and nothing
+ * page-specific. It lives in `components/product/` rather than under `home/`
+ * because it has more than one caller.
  *
  * Hover moves colour only, never geometry. Lifting a card on hover is one of
  * the generic-craft-page tells CLAUDE.md names, and a grid where every card
