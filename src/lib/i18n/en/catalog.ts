@@ -49,7 +49,21 @@ export const catalog = {
   },
 
   artisan: {
-    /** {id} is replaced at call time; placeholder copy until Increment 11. */
-    profileTitle: 'Artisan {id}',
+    /** {count} is replaced at call time. */
+    productCount: '{count} pieces listed',
+    productCountOne: '1 piece listed',
+    heading: 'Their work',
+    /*
+     * Not-found rather than a rejection notice. A buyer who lands on an
+     * unapproved artisan is told the profile is not available, and nothing
+     * more: whether someone was rejected, or is still waiting on review, is
+     * the ministry's business and not a stranger's (PRD 11.5, Increment 11).
+     */
+    notFoundTitle: 'That artisan profile is not available',
+    notFoundBody: 'It may have been removed, or the link may be wrong.',
+    backToBrowse: 'Browse all crafts',
+    emptyTitle: 'This artisan has not listed products yet',
+    emptyBody: 'Their approved work will appear here once it is listed.',
+    error: 'Could not load this artisan.',
   },
 } as const

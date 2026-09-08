@@ -51,6 +51,9 @@ async function getProducts(filters?: ProductFilters): Promise<Product[]> {
   if (filters?.categoryId) {
     result = result.filter((p) => p.categoryId === filters.categoryId)
   }
+  if (filters?.artisanId) {
+    result = result.filter((p) => p.artisanId === filters.artisanId)
+  }
   if (filters?.region) {
     result = result.filter((p) => (regionByArtisan.get(p.artisanId) ?? '') === filters.region)
   }

@@ -63,6 +63,13 @@ export type ProductSort = 'newest' | 'price-asc' | 'price-desc'
 export interface ProductFilters {
   query?: string
   categoryId?: string
+  /**
+   * One artisan's catalog (PRD 11.5). A query shape rather than a new column,
+   * so it costs the Supabase schema nothing: it is an `eq` on a foreign key
+   * the table already has. Status filtering stays inside the provider, so a
+   * caller cannot ask for one artisan's pending work by accident.
+   */
+  artisanId?: string
   region?: string
   minPrice?: number
   maxPrice?: number
