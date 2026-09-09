@@ -14,7 +14,7 @@ interface RemoteImageProps {
 /**
  * An image that cannot break its card.
  *
- * Product and artisan imagery is served from a remote host (picsum today,
+ * Product and artisan imagery is served from a remote host (Pexels today,
  * Supabase Storage later), so a single 404 or a blocked request is a normal
  * occurrence rather than an edge case. Left alone, a broken <img> collapses to
  * its alt text and drags the whole card's layout with it.

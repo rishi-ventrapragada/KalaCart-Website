@@ -142,5 +142,5 @@ const productSeeds: ProductSeed[] = [
 
 export const products: Product[] = productSeeds.map(({ images, ...rest }) => ({
   ...rest,
-  imageUrls: gallery(rest.id, images),
+  imageUrls: gallery(rest.id, images, rest.categoryId),
 }))
