@@ -418,6 +418,68 @@ p {
   }
 }
 
+/*
+ * THE HERO SPIRAL.
+ *
+ * A slow helix of product photography beside the headline. The transforms are
+ * written per frame by useSpiralRotation, so - like the craft rail - nothing
+ * may transition them: `transition: none` is explicit rather than a zero
+ * duration, because `transition-property` defaults to `all` and one inherited
+ * duration silently reintroduces the lag (CLAUDE.md motion discipline).
+ */
+.hero-spiral {
+  /* Matches the `perspective` in the geometry the transform module reads. */
+  perspective: 1000px;
+  pointer-events: none;
+  /*
+   * The helix is taller than its box - eight cards at 58px of rise is about
+   * 460px of travel, and cards wrap from top to bottom through the ends. Fading
+   * the ends rather than hard-clipping them means a card leaves and re-enters
+   * through a soft edge instead of popping at a visible boundary.
+   */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 1) 18%,
+    rgba(0, 0, 0, 1) 82%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 1) 18%,
+    rgba(0, 0, 0, 1) 82%,
+    transparent 100%
+  );
+}
+
+.hero-spiral__card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--line);
+  background: var(--card);
+  backface-visibility: hidden;
+  will-change: transform, opacity, filter;
+  /* Scroll- and clock-driven transforms never transition. */
+  transition: none;
+}
+
+/*
+ * Reduced motion: the loop never starts (useSpiralRotation returns before
+ * requesting a frame), so the cards keep the resting layout it painted once.
+ * `will-change` is released because nothing will change - holding a compositor
+ * layer per card for a static image is pure cost.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .hero-spiral__card {
+    will-change: auto;
+    filter: none;
+  }
+}
+
 /* Visible keyboard focus everywhere (CLAUDE.md law 7). */
 :focus-visible {
   outline: 2px solid var(--accent);

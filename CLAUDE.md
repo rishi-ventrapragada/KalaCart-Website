@@ -1,5 +1,5 @@
 # KalaCart — CLAUDE.md
-*Last updated: 2026-09-08 · Owner: Rishi Ventrapragada*
+*Last updated: 2026-09-10 · Owner: Rishi Ventrapragada*
 
 ---
 
@@ -36,6 +36,7 @@ Stage: active development / pre-launch.
 - `2026-09-08` — Remote imagery renders through `RemoteImage`: the wrapper owns the geometry so a dead image cannot collapse a card's layout.
 - `2026-09-08` — Mock behaviour is disclosed in the UI, not just in code comments. A demo reviewer takes on-screen copy at face value and cannot read a comment.
 - `2026-09-08` — Admin charts are hand-rolled SVG, not Recharts. Supersedes the Recharts mention in §C and PRD 11.8. Two charts on one gated page do not justify ~90 kB gzipped of D3, and inline SVG reads the theme's CSS variables and category dye tones directly instead of needing a theme-reading wrapper around `ResponsiveContainer`. See `memory/decisions.md`.
+- `2026-09-10` — Real product photography **is** allowed in the hero, as a rotating spiral beside the headline. This reopens the texture-only hero decision on that decision's own grounds: the illustrated motifs were rejected for being *drawn subjects* competing with the headline, and specifically for dating badly against the real photography arriving in Increments 8 and 10. Photography is not a competing subject — it is the goods. It also sits in its own column beside the copy, never under it, so the grain's legibility mask is untouched. Texture-only still governs the hero *ground*. See `memory/decisions.md`.
 - `2026-09-08` — Acceptance criteria are enforced by a committed sweep (`npm run audit`), not by memory. Structure, contrast, overflow, focus and reduced-motion are checked on the production build across four widths and both themes; looks still need a human pass. See `audit/README.md`.
 
 ## E · Memory Map
@@ -68,3 +69,17 @@ When explicitly asked to save, store, wrap up, or remember the conversation (e.g
 2. Structure: H1 title, one-line TL;DR, **What we discussed**, **What we decided**, and **What's next**.
 3. Keep it punchy and concrete — no fluff.
 4. Never write to `memory/sessions/` without an explicit trigger from the user in chat.
+
+## I · External Component Adoption Protocol
+Governs any component pasted in from outside this repo — reactbits, Codrops, a CodePen, a reference site, another project. External components are written against no constraints; this codebase has eight. Run every step, in order, **before** integrating. Where a step conflicts with the source component, the codebase wins.
+
+1. **Scope.** Name the route and section it lands in. Home carries the full motion budget; every other route is reveal-only, with no continuous animation.
+2. **Motion audit.** Does it start its own `requestAnimationFrame` loop or attach its own scroll listener? If it is scroll-linked and going on Home, it registers through `useScrollEngine.register()` — never a second independent scroll source alongside the Lenis singleton, which would read a different value than the rest of the page and drift out of phase. A self-contained, non-scroll-linked animation (a continuous auto-rotation, say) is lower risk, but still owes step 3.
+3. **Reduced motion.** Under `prefers-reduced-motion` the loop must *stop*, not slow down and not zero its visual delta. No idling loops. Match `useScrollEngine`: compute the resting state, write it once, and never call `requestAnimationFrame` at all.
+4. **Colour audit.** Every raw hex, `rgba()` and named colour mapped to an existing semantic token, verified in both themes. A genuinely new colour needs a §D decision first.
+5. **Dependency check.** If it needs a package the stack does not already carry (framer-motion, GSAP, three.js), **stop and ask.** Never install silently.
+6. **Data.** Real content is read through `src/lib/data/`, never the component's own fetch. If the read is async it owes the three-states rule — and if a state is deliberately omitted, say so and why rather than letting it pass unnoticed.
+7. **i18n.** Every user-facing string extracted into `src/lib/i18n/`. No hardcoded copy.
+8. **File-size cap.** Split to fit the ~200-line law. Logic comes out into hooks; pure maths comes out into its own module.
+9. **Accessibility.** Verify keyboard operability, focus visibility, `alt` text and ARIA roles **by hand.** Do not assume the source got any of it right — it usually did not.
+10. **Decision conflicts.** If adopting it reopens or contradicts a §D decision, record a new §D entry giving the reasoning, rather than silently overriding the old one.
