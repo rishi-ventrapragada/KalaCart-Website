@@ -23,9 +23,25 @@ export async function auditRailFallback(browser, BASE, record) {
     await page.waitForTimeout(1400)
 
     const rail = await page.evaluate(() => {
-      const el = document.querySelector('.craft-rail')
+      /*
+       * The VIEWPORT is the scroll region, not the rail itself. The rail is the
+       * animated track inside it and is sized to its content, so its own
+       * scrollWidth and clientWidth are always equal - asserting against it
+       * would test nothing. Repointed when the drift became a marquee
+       * (2026-09-11); the assertion below is unchanged.
+       */
+      const el = document.querySelector('.craft-rail-viewport')
       if (!el) return null
-      const last = el.children[el.children.length - 1]
+      /*
+       * Reach the last actual CARD, not the last wrapper. The cards are two
+       * levels down now (viewport > rail > track > card), and measuring a
+       * full-width track's box would pass regardless of whether a card is
+       * reachable, which is precisely the class of false pass this check exists
+       * to prevent.
+       */
+      const cards = el.querySelectorAll('.craft-rail__track > *')
+      const last = cards[cards.length - 1]
+      if (!last) return null
       last.scrollIntoView({ block: 'nearest', inline: 'end' })
       const box = last.getBoundingClientRect()
       return {
@@ -35,7 +51,7 @@ export async function auditRailFallback(browser, BASE, record) {
     })
 
     const label = `[${String(width)} rm] craft rail`
-    if (!rail) record(label, ['.craft-rail not found'])
+    if (!rail) record(label, ['.craft-rail-viewport not found, or it holds no cards'])
     else {
       if (!rail.scrollable) record(label, ['rail cannot scroll with motion off'])
       if (!rail.lastReachable) record(label, ['last card unreachable with motion off'])

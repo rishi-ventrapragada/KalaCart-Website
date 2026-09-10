@@ -1,44 +1,31 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 
-import { useRailDrift } from '@/components/motion/useRailDrift'
+import { CraftCard } from '@/components/home/CraftCard'
+import { useMarqueeLoop } from '@/components/motion/useMarqueeLoop'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { getCategories } from '@/lib/data'
 import type { Category } from '@/lib/data'
 import { useT } from '@/lib/i18n'
-import { cn } from '@/lib/utils/cn'
-
-/** Tailwind cannot see a class built at runtime, so the dye map is explicit. */
-const DYE_BORDER: Record<Category['dye'], string> = {
-  indigo: 'border-indigo/45',
-  madder: 'border-madder/45',
-  marigold: 'border-marigold/45',
-  brass: 'border-brass/45',
-}
-
-const DYE_DOT: Record<Category['dye'], string> = {
-  indigo: 'bg-indigo',
-  madder: 'bg-madder',
-  marigold: 'bg-marigold',
-  brass: 'bg-brass',
-}
 
 /**
- * THE CRAFT RAIL: the page's lateral move.
+ * THE CRAFT RAIL: a continuous band of craft cards.
  *
- * A row of craft cards that travels sideways as the reader scrolls down. It is
- * the moment the page stops behaving like a document, and it doubles as the
+ * The row loops leftward forever and pauses under the cursor, so the reader can
+ * stop it on the craft they want rather than chasing it. It doubles as the
  * browse-by-craft strip PRD 11.2 asks for.
+ *
+ * It used to be Home's SCROLL-DRIVEN lateral move (`useRailDrift`). That is now
+ * retired for this section: a scroll-linked transform and a continuous animation
+ * would both be writing lateral position to the same element and would fight
+ * every frame. Home keeps its other scroll-linked moments (the hero spiral, the
+ * maker fan). See CLAUDE.md D, 2026-09-11.
  *
  * Data comes through the seam, never from a fixture, with loading and a
  * retryable error state (PRD 5.4). There is no empty branch: the categories are
- * the site's fixed taxonomy, so an empty result is a failure, not a state. The
- * dye tone lives in the card's border and dot, never in its label, per the
- * Increment 5 contrast resolution.
+ * the site's fixed taxonomy, so an empty result is a failure, not a state.
  */
 export function CraftRail() {
-  const rail = useRailDrift<HTMLDivElement>(0.85)
   const [result, setResult] = useState<{
     attempt: number
     state: 'loading' | 'error' | 'ready'
@@ -80,6 +67,10 @@ export function CraftRail() {
   const state = settled ? result.state : 'loading'
   const categories = settled ? result.categories : []
 
+  // Re-measured whenever the card set changes, so the cycle length always
+  // matches what is actually on the rail.
+  const { ref, duration } = useMarqueeLoop<HTMLDivElement>(categories.length)
+
   if (state === 'error') {
     /*
      * A real retry, added in Increment 16. This branch used to render bare text
@@ -97,34 +88,48 @@ export function CraftRail() {
     )
   }
 
+  if (state === 'loading') {
+    return (
+      <div className="flex justify-center gap-5 overflow-hidden px-4 sm:px-6">
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <Skeleton key={i} className="h-[8.5rem] w-[15rem] shrink-0 rounded-card" />
+        ))}
+      </div>
+    )
+  }
+
+  /*
+   * The track is rendered TWICE. The loop translates by exactly -50%, which is
+   * one full copy, so the moment it wraps back to zero the second copy is
+   * sitting precisely where the first was and the seam is invisible. One copy
+   * cannot do this: it would run out and leave a gap before it reset.
+   *
+   * Only the first copy is reachable - the duplicate is aria-hidden and out of
+   * the tab order, so assistive technology hears each craft once.
+   *
+   * Under reduced motion `duration` is null: no animation is applied at all and
+   * the CSS turns the rail into a hand-scrollable region (PRD 10.7).
+   */
   return (
-    <div
-      ref={rail}
-      // Under reduced motion this becomes a real scroll region, so every card
-      // stays reachable when the drift is switched off (PRD 10.7).
-      className="craft-rail flex w-max gap-4 px-4 sm:px-6"
-    >
-      {state === 'loading'
-        ? [0, 1, 2, 3, 4, 5].map((i) => (
-            <Skeleton key={i} className="h-[7.5rem] w-[15rem] rounded-card" />
-          ))
-        : categories.map((category) => (
-            <Link
-              key={category.id}
-              to={`/browse?category=${category.slug}`}
-              className={cn(
-                'group flex h-[7.5rem] w-[15rem] shrink-0 flex-col justify-between',
-                'rounded-card border bg-card p-4',
-                'transition-colors duration-200 ease-site hover:border-accent',
-                DYE_BORDER[category.dye],
-              )}
-            >
-              <span className={cn('size-2 rounded-full', DYE_DOT[category.dye])} />
-              <span className="font-display text-lg leading-tight text-ink">
-                {category.name}
-              </span>
-            </Link>
+    <div className="craft-rail-viewport" data-paused={duration === null || undefined}>
+      <div
+        className="craft-rail"
+        style={duration === null ? undefined : { animationDuration: `${String(duration)}s` }}
+      >
+        <div ref={ref} className="craft-rail__track">
+          {categories.map((category) => (
+            <CraftCard key={category.id} category={category} />
           ))}
+        </div>
+
+        {duration !== null && (
+          <div className="craft-rail__track" aria-hidden>
+            {categories.map((category) => (
+              <CraftCard key={`echo-${category.id}`} category={category} decorative />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

@@ -485,35 +485,120 @@ p {
 }
 
 /*
- * THE CRAFT RAIL.
+ * THE CRAFT RAIL: a continuous leftward loop.
  *
- * The transform is written per frame by the scroll engine, so no transition
- * touches it (PRD 10.2). Only colour transitions, and those live on the cards.
+ * This replaced the scroll-driven drift on 2026-09-11 (CLAUDE.md D). The travel
+ * is a compositor-driven CSS animation rather than a per-frame transform,
+ * because a marquee needs no scroll value: it reads nothing from the Lenis
+ * singleton and adds no rAF loop of its own (PRD 10.1).
+ *
+ * The duration is set inline by useMarqueeLoop from the measured track width, so
+ * the speed is constant in px/sec however many crafts are on the rail.
  */
+.craft-rail-viewport {
+  overflow: hidden;
+  /*
+   * Headroom for the hover lift.
+   *
+   * `overflow: hidden` is load-bearing - it is what hides the off-screen copies
+   * - but it clips VERTICALLY as well as horizontally, and a card that rises on
+   * hover was having its top edge and its shadow sheared off flat against the
+   * heading above. The padding gives the lift somewhere to go inside the clip
+   * box; the matching negative margin cancels it again, so the row sits exactly
+   * where it did and the section's rhythm is unchanged.
+   *
+   * Sized for the whole hover state, not just the travel: -translate-y-1 is 4px,
+   * and the 28px-blur shadow needs the rest of the room.
+   */
+  padding-block: 2.5rem;
+  margin-block: -2.5rem;
+  /*
+   * The soft ends. Cards must enter and leave through a fade or the loop shows
+   * two hard vertical seams where they pop in and out. The mask is what makes
+   * an edge-to-edge band read as endless rather than as a clipped row.
+   *
+   * The gradient runs `to right` only, so it is uniform down the column and the
+   * padding above is not masked away.
+   */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 5rem,
+    #000 calc(100% - 5rem),
+    transparent 100%
+  );
+}
+
 .craft-rail {
+  display: flex;
+  width: max-content;
+  animation-name: craft-rail-loop;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
   will-change: transform;
-  /* The transform is scroll-driven, so nothing may transition it (PRD 10.2).
-     The cards inside carry their own colour transitions. */
+  /*
+   * The travel is animation-driven, so nothing may TRANSITION it (PRD 10.2).
+   * Explicit rather than a zero duration: `transition-property` defaults to
+   * `all`, and one inherited duration would silently re-introduce the lag
+   * (CLAUDE.md motion discipline). The cards carry their own colour transitions.
+   */
   transition: none;
 }
 
+.craft-rail__track {
+  display: flex;
+  gap: 1.25rem;
+  /* Half the gap, so the seam between the two copies matches the spacing
+     inside them and the wrap point stays invisible. */
+  padding-inline: 0.625rem;
+}
+
 /*
- * Reduced motion: the drift stops, so the rail must become reachable by hand
- * or everything past the fold is unreachable. It turns into a native
- * horizontally scrollable region with snap points (PRD 10.7: usable with
- * motion off, no exceptions).
+ * Linear, because a marquee has no start or end to ease between - the site's
+ * one easing curve governs transitions with endpoints, and applying it to an
+ * infinite loop would make the row visibly surge and stall once per cycle.
+ *
+ * -50% is exactly one of the two copies, so the reset is seamless.
+ */
+@keyframes craft-rail-loop {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* Pause under the cursor so a reader can stop the row on the craft they want.
+   Focus pauses it too: a keyboard user tabbing into a moving card needs it to
+   hold still just as much (PRD 10.7). */
+.craft-rail-viewport:hover .craft-rail,
+.craft-rail-viewport:focus-within .craft-rail {
+  animation-play-state: paused;
+}
+
+/*
+ * Reduced motion: the loop STOPS, it does not slow down. The rail must then be
+ * reachable by hand or everything past the fold is unreachable, so it becomes a
+ * native horizontally scrollable region with snap points (PRD 10.7: usable with
+ * motion off, no exceptions). The component also renders a single copy in this
+ * case, so there is no duplicate content to scroll through.
  */
 @media (prefers-reduced-motion: reduce) {
-  .craft-rail {
-    transform: none !important;
-    will-change: auto;
+  .craft-rail-viewport {
     overflow-x: auto;
     max-width: 100%;
     scroll-snap-type: x proximity;
     -webkit-overflow-scrolling: touch;
   }
 
-  .craft-rail > * {
+  .craft-rail {
+    animation: none;
+    transform: none;
+    will-change: auto;
+  }
+
+  .craft-rail__track > * {
     scroll-snap-align: start;
   }
 }
