@@ -32,10 +32,19 @@ export const buttonVariants: Record<ButtonVariant, string> = {
   primary: 'bg-accent text-canvas hover:bg-accent-deep',
   secondary: 'border border-line-strong bg-card text-ink hover:border-accent',
   ghost: 'text-muted hover:bg-card hover:text-ink',
-  // `ink`, not `canvas`. The secondary tone is mid-tone in both themes, so a
-  // canvas-coloured label failed AA on it (2.85:1 light, 2.89:1 dark). `ink`
-  // measures 5.09:1 and 5.44:1 (Increment 5).
-  destructive: 'bg-secondary text-ink hover:bg-secondary/85',
+  /*
+   * `canvas`, not `ink` - inverted by the 2026-09-10 palette revision.
+   *
+   * This used to be `text-ink`, and that was correct while `secondary` was a
+   * mid-tone amber and `ink` a dark brown: the dark label measured 5.09:1 on
+   * it. Both ends moved. `secondary` is now madder (a dark red) and `ink` is a
+   * dark espresso, which puts a dark label on a dark fill at 2.13:1 - badly
+   * under AA and the worst pairing on the site.
+   *
+   * The fill is dark in both themes now, so the label follows `primary` and
+   * goes light: 5.99:1 in light, 4.88:1 in dark.
+   */
+  destructive: 'bg-secondary text-canvas hover:bg-secondary/85',
 }
 
 export const buttonSizes: Record<ButtonSize, string> = {

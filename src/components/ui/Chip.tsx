@@ -18,6 +18,10 @@ const dyeMarks: Record<DyeName, string> = {
   madder: 'bg-madder',
   marigold: 'bg-marigold',
   brass: 'bg-brass',
+  // Completes the map for the `sage` dye added by the 2026-09-10 palette
+  // revision. `DyeName` is derived from `dyes`, so a new tone makes this
+  // exhaustive record a build error until it is named here.
+  sage: 'bg-sage',
 }
 
 /**

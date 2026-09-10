@@ -22,16 +22,20 @@ const tones: Record<BadgeTone, string> = {
   positive: 'border-accent text-accent',
   pending: 'border-marigold text-ink',
   /*
-   * `madder`, not `secondary`. In the light theme `secondary` is #B8862F and
-   * `marigold` is #C9922B - both amber, so a pending badge and a rejected one
-   * were the same colour at a glance. That is fine where the two never meet,
-   * but the admin artisan table (Increment 14) puts them in one column whose
-   * whole job is telling them apart.
+   * `madder`, not `secondary` - kept, but for a different reason than before.
    *
-   * `madder` is a dye token with the same value in both themes, and it is
-   * already what the dark theme's `secondary` resolves to for this badge, so
-   * rejected now reads red on both. The border carries it, never the label:
-   * the dyes fail AA as text (Increment 5).
+   * The original reason was a collision: light `secondary` was #B8862F against
+   * `marigold` #C9922B, so pending and rejected read as the same amber in the
+   * admin artisan table (Increment 14), whose whole job is telling them apart.
+   * The 2026-09-10 palette revision made `secondary` a red, which retires that
+   * collision - pending (marigold) and rejected are now plainly different.
+   *
+   * It stays `madder` anyway, because `madder` is a DYE: one fixed value in
+   * both themes. `secondary` is theme-dependent (#A63A3A light, #C85C5C dark)
+   * and, more to the point, is now the "something is wrong" token - it tracks
+   * the destructive fill and will move with it. A status badge should not
+   * inherit those shifts. The border carries the tone, never the label: the
+   * dyes fail AA as text (Increment 5).
    */
   negative: 'border-madder text-ink',
 }

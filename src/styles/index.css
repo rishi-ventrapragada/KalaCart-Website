@@ -15,16 +15,17 @@
 :root {
   color-scheme: light;
 
-  /* Light "Raw Cotton" (PRD 9.1). */
-  --canvas: #f5f0e6;
-  --card: #ffffff;
-  --ink: #241e1a;
-  --muted: #6f6559;
-  --line: #e3d9c6;
-  --line-strong: #9c8555;
-  --accent: #2e4374;
-  --accent-deep: #1b2a4a;
-  --secondary: #b8862f;
+  /* Light "Raw Cotton" (PRD 9.1, revised 2026-09-10). Mirrors src/app/theme.ts,
+     which carries the measured reasoning behind each value. */
+  --canvas: #f6e9df;
+  --card: #fffdfb;
+  --ink: #3c2a21;
+  --muted: #6b5647;
+  --line: #e7d7c9;
+  --line-strong: #957055;
+  --accent: #a55133;
+  --accent-deep: #8f4529;
+  --secondary: #a63a3a;
 
   /*
    * Frosted-nav fill (PRD 10.5). A translucent canvas, not a new hue: the nav
@@ -32,7 +33,7 @@
    * is high enough that nav labels keep their AA contrast over any hero layer
    * scrolling underneath, which a lighter frost would not guarantee.
    */
-  --glass: rgba(245, 240, 230, 0.82);
+  --glass: rgba(246, 233, 223, 0.86);
 
   /*
    * The woven grain (hero and closing bookend).
@@ -117,17 +118,18 @@
 [data-theme='dark'] {
   color-scheme: dark;
 
-  /* Dark "Gallery Wall" (PRD 9.2). */
-  --canvas: #17130f;
-  --card: #201a15;
-  --ink: #f3ece0;
-  --muted: #a79a88;
+  /* Dark "Gallery Wall" (PRD 9.2, revised 2026-09-10). Mirrors src/app/theme.ts,
+     which carries the measured reasoning behind each value. */
+  --canvas: #121212;
+  --card: #1c1c1c;
+  --ink: #ededed;
+  --muted: #9a9a9a;
   --line: rgba(255, 255, 255, 0.1);
-  --line-strong: rgba(255, 255, 255, 0.36);
-  --accent: #c9922b;
-  --accent-deep: #a8761f;
-  --secondary: #a63a3a;
-  --glass: rgba(23, 19, 15, 0.82);
+  --line-strong: rgba(255, 255, 255, 0.4);
+  --accent: #e08a5f;
+  --accent-deep: #c86f45;
+  --secondary: #c85c5c;
+  --glass: rgba(18, 18, 18, 0.86);
 
   /*
    * Dark inverts the logic: ink is the light value here, so a darker thread
@@ -168,6 +170,7 @@
   --color-madder: #a63a3a;
   --color-marigold: #c9922b;
   --color-brass: #b8862f;
+  --color-sage: #7e9679;
 
   --ease-site: var(--ease);
   --radius-control: var(--radius-control);
