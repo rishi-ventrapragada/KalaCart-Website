@@ -47,6 +47,24 @@
   /* Thread weight. Kept under a pixel so the weave stays texture, not pattern. */
   --grain-thread: 0.75px;
 
+  /*
+   * The DEEP weave: the same bias grain, carried far enough to actually read.
+   *
+   * Same structure as the default weave above - two crossed thread families on
+   * the bias - only darker and a touch thicker. It is a separate pair of tokens
+   * rather than a change to the defaults because only the hero can afford it:
+   * see `.material-field__grain--deep`.
+   *
+   * The numbers are matched by measurement, not by eye. Mean ink coverage was
+   * sampled against the rejected knit prototype: 26%/20% at 1.25px lands at 98%
+   * of the knit's luminance drop, where the shipped default sits at 25%. Going
+   * darker still (34% at 1px) hits the same coverage but the diagonals harden
+   * into a grey mesh - the cloth read is carried by thread *weight*, not by ink.
+   */
+  --grain-deep-warp: color-mix(in srgb, var(--ink) 26%, transparent);
+  --grain-deep-weft: color-mix(in srgb, var(--ink) 20%, transparent);
+  --grain-deep-thread: 1.25px;
+
   /* The one easing curve for every transition on the site (PRD 9.7). */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -111,6 +129,16 @@
   --grain-warp: color-mix(in srgb, var(--accent) 14%, transparent);
   --grain-weft: color-mix(in srgb, var(--accent) 10%, transparent);
   --grain-thread: 0.6px;
+
+  /*
+   * The deep weave inverts the same way the default does: ink is the light
+   * value in dark, so a darker thread would vanish into the charcoal. The
+   * weave is picked out in the theme's brass instead, carried higher than the
+   * default for the same reason light is - it is the hero ground, where the
+   * legibility mask has already cleared the reading column.
+   */
+  --grain-deep-warp: color-mix(in srgb, var(--accent) 30%, transparent);
+  --grain-deep-weft: color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
 @theme inline {
@@ -342,6 +370,43 @@ p {
       135deg,
       var(--grain-weft) 0 var(--grain-thread),
       transparent var(--grain-thread) 9px
+    );
+}
+
+/*
+ * THE DEEP WEAVE: the hero ground, carried far enough to actually read.
+ *
+ * Structurally identical to the default grain above - the same two bias thread
+ * families at 45 and 135 degrees, the same mismatched 7px/9px pitches that keep
+ * the crossings from forming a regular lattice. Only the threads are darker and
+ * a quarter-pixel heavier. Nothing about the cloth changes; it is simply woven
+ * in a heavier yarn.
+ *
+ * WHY THE CLOSING BOOKEND DOES NOT GET THIS. The hero's legibility mask clears
+ * the texture from the reading column, so its copy sits at roughly a quarter
+ * strength and the heavier thread costs it nothing - measured 4.60:1 against
+ * `muted`, unchanged from the default weave. The closing CTA centres its copy in
+ * the open middle of the frame, where the same left-to-right mask has already
+ * faded to ~0.94: full strength, directly under 16px muted body text. Measured
+ * there, this weave takes it from 4.31:1 down to 3.47:1. So the bookend keeps
+ * the default: decoration yields to legibility exactly where they overlap
+ * (CLAUDE.md D, 2026-09-08), and here that means per surface.
+ *
+ * Those figures are worst-pixel measurements, not sweep output. The acceptance
+ * sweep cannot see this texture at all - see the 2026-09-10 blind-spot entry in
+ * CLAUDE.md D before changing anything here.
+ */
+.material-field__grain--deep {
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      var(--grain-deep-warp) 0 var(--grain-deep-thread),
+      transparent var(--grain-deep-thread) 7px
+    ),
+    repeating-linear-gradient(
+      135deg,
+      var(--grain-deep-weft) 0 var(--grain-deep-thread),
+      transparent var(--grain-deep-thread) 9px
     );
 }
 

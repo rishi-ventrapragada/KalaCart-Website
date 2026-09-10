@@ -30,7 +30,12 @@ export function HeroSection() {
       // section instead of overflowing it.
       className="relative isolate flex min-h-[38rem] items-center overflow-hidden py-24 sm:min-h-[44rem] sm:py-32"
     >
-      <MaterialField />
+      {/*
+        The hero ground is woven in the heavier yarn. Safe here and only here:
+        the grain's mask clears the reading column, so the darker thread never
+        sits under the copy. The closing bookend keeps the default weight.
+      */}
+      <MaterialField weight="deep" />
 
       <Container className="relative z-10">
         {/*
