@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom'
 import { MotionProvider } from '@/app/MotionProvider'
 import { useLenis } from '@/app/useLenis'
 import { useScrollReset } from '@/app/useScrollReset'
+import { BackToTop } from '@/components/layout/BackToTop'
 import { Footer } from '@/components/layout/Footer'
 import { Navbar } from '@/components/layout/Navbar'
 
@@ -31,6 +32,9 @@ export default function AppShell() {
         <main className="flex-1">
           <Outlet />
         </main>
+        {/* Between the content and the footer, so it is the last thing before
+            the page ends rather than an overlay on top of it. */}
+        <BackToTop />
         <Footer />
       </div>
     </MotionProvider>

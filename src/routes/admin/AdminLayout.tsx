@@ -4,6 +4,7 @@ import { ADMIN_LOGIN_PATH } from '@/app/adminAuth'
 import { useAdmin } from '@/app/useAdmin'
 import { useScrollReset } from '@/app/useScrollReset'
 import { MockAuthNotice } from '@/components/admin/MockAuthNotice'
+import { BackToTop } from '@/components/layout/BackToTop'
 import { Container } from '@/components/layout/Container'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
 import { buttonBase, buttonSizes, buttonVariants } from '@/components/ui/buttonStyles'
@@ -96,6 +97,13 @@ export default function AdminLayout() {
           <Outlet />
         </Container>
       </main>
+
+      {/*
+        The desk has no footer, so this sits at the foot of the shell itself.
+        The verification queue is the longest scroll on the site, which is
+        exactly where returning to the top by hand is most tedious.
+      */}
+      <BackToTop />
     </div>
   )
 }
