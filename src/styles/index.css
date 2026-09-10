@@ -557,6 +557,45 @@ p {
   }
 }
 
+/*
+ * THE MAKER FAN (Increment 18, adopted under CLAUDE.md §I).
+ *
+ * x, y, rotation, scale and zIndex are written by GSAP from useBounceFan, so -
+ * like the craft rail and the hero spiral - nothing here may transition them:
+ * `transition: none` is explicit rather than a zero duration, because
+ * `transition-property` defaults to `all` and one inherited duration silently
+ * reintroduces the lag (CLAUDE.md motion discipline).
+ */
+.bounce-fan__card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /*
+   * The card is placed by its own centre, so the geometry module can work in
+   * signed offsets from the middle of the fan and never needs to know the
+   * container's width. GSAP writes x/y on top of this via its own transform,
+   * which composes rather than replacing the centring.
+   */
+  margin-left: calc(var(--fan-card-size, 132px) / -2);
+  margin-top: calc(var(--fan-card-size, 132px) / -2);
+  border-radius: var(--radius-card);
+  background: var(--card);
+  will-change: transform;
+  /* Event- and clock-driven transforms never transition. */
+  transition: none;
+}
+
+/*
+ * Reduced motion: no tween is ever created (useBounceFan writes the resting
+ * layout with gsap.set and returns), so `will-change` is released - holding a
+ * compositor layer per card for a static image is pure cost.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .bounce-fan__card {
+    will-change: auto;
+  }
+}
+
 /* Visible keyboard focus everywhere (CLAUDE.md law 7). */
 :focus-visible {
   outline: 2px solid var(--accent);

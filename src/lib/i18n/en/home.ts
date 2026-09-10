@@ -34,6 +34,13 @@ export const home = {
       body: 'Verified artisans listing their own work, in their own words.',
       error: 'Could not load artisans.',
       seeAll: 'See all artisans',
+      /*
+       * Names the fanned group for assistive technology. The fan is a visual
+       * arrangement of the same links the grid renders below `lg`, so the label
+       * describes the set rather than the gesture: nobody navigating by list
+       * needs to know the cards overlap.
+       */
+      fanLabel: 'Featured artisans',
       /* Matches the products grid: a section that resolves to nothing says so
          rather than leaving a heading over an empty row (PRD 5.4). */
       empty: 'No artisans are listed yet.',
