@@ -2,7 +2,6 @@
 export const home = {
   home: {
     hero: {
-      badge: 'Direct from the maker',
       /*
        * The headline ships as two keys, not one string the component splits.
        * PRD 10.4 masks each line separately, and where a line breaks is a
