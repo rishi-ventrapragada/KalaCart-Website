@@ -42,6 +42,30 @@ export interface ThemeTokens {
    * surfaces alike (Increment 5). Labels on a secondary fill use `ink`.
    */
   secondary: string
+  /**
+   * A full-bleed band that deliberately breaks from the page ground, so a
+   * section reads as a held moment rather than more scroll.
+   *
+   * It means CONTRASTING, not dark, and the two themes move in opposite
+   * directions: light goes darker than its parchment canvas, dark goes LIGHTER
+   * than its charcoal one. A literally dark strip on the dark theme's #121212
+   * would be an invisible band.
+   */
+  surfaceContrast: string
+  /**
+   * Text on `surfaceContrast`, and the reason that band needs a token pair.
+   *
+   * Because the ground inverts in light but not in dark, a component painting
+   * on it cannot name `ink` or `canvas` and be right in both themes. This slot
+   * resolves the direction in the palette instead, so the component stays
+   * declarative: it is `canvas` in light (13.72:1 on the band) and `ink` in
+   * dark (13.26:1), both measured.
+   *
+   * NOTE: `accent` measures only 2.97:1 on the light band. Nothing on this
+   * surface may use the accent as a text colour - including SectionHeader's
+   * optional "see all" link, which is why ImpactBand passes none.
+   */
+  onSurfaceContrast: string
 }
 
 /**
@@ -85,6 +109,19 @@ export const lightTheme: ThemeTokens = {
    * on card. The palette's sage lives on as a `dyes` entry instead.
    */
   secondary: '#A63A3A',
+  /*
+   * Espresso deepened one step past `ink`, and set by the label floor rather
+   * than picked. The band's copy is `canvas`, so canvas-on-band carries the 4.5
+   * floor: this measures 13.72:1, with `card` at 16.10:1 for anything raised.
+   *
+   * Deeper than `ink` (#3C2A21) on purpose. Reusing `ink` as a fill would put
+   * the section's own default text colour at 1.00:1 against its ground - the
+   * one pairing guaranteed to be invisible - and a band that is merely
+   * ink-coloured reads as a heavy paragraph rather than a change of surface.
+   */
+  surfaceContrast: '#2A1D16',
+  // The canvas, unchanged: 13.72:1 on the band above.
+  onSurfaceContrast: '#F6E9DF',
 }
 
 /**
@@ -128,6 +165,22 @@ export const darkTheme: ThemeTokens = {
    * floor: 4.59 for the label, 4.59 as a border on canvas, 4.17 on card.
    */
   secondary: '#C85C5C',
+  /*
+   * LIGHTER than the canvas, which is the whole asymmetry: this theme's ground
+   * is already #121212, so a "dark strip" would be a band nobody can see.
+   *
+   * Lifted a step past `card` (#1C1C1C) so the band still reads as a distinct
+   * surface where it meets a card, without becoming a second card itself:
+   * 1.207:1 against canvas, 1.098:1 against card. Luminance only, no hue,
+   * matching the reasoning that keeps this theme's cards neutral.
+   */
+  surfaceContrast: '#242424',
+  /*
+   * `ink`, unchanged - and the reason this is a token pair rather than one
+   * colour. Dark needs NO inversion: its ordinary text already sits happily on
+   * the band (13.26:1 here, and `muted` at 5.52:1), so only light flips.
+   */
+  onSurfaceContrast: '#EDEDED',
 }
 
 export const themes: Record<ThemeName, ThemeTokens> = {

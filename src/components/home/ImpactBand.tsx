@@ -61,19 +61,32 @@ export function ImpactBand() {
         ]
 
   return (
-    <section className="py-20 sm:py-24">
+    <section className="relative isolate bg-surface-contrast py-20 text-on-surface-contrast sm:py-24">
       <Container className="flex flex-col gap-8">
+        {/*
+          No `linkTo` here, deliberately. SectionHeader's optional link is
+          `text-accent`, which measures 2.97:1 on the light band and fails AA -
+          the one token that cannot come onto this surface.
+        */}
         <SectionHeader heading={t('home.impact.heading')} />
 
         {summary.state === 'error' ? (
-          <ErrorState message={t('home.impact.error')} onRetry={summary.retry} />
+          <ErrorState message={t('home.impact.error')} onRetry={summary.retry} tone="contrast" />
         ) : (
           <dl className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4">
             {summary.state === 'loading'
               ? Array.from({ length: 4 }, (_, i) => (
                   <div key={i} className="flex flex-col gap-2">
-                    <Skeleton className="h-9 w-20" />
-                    <Skeleton className="h-3 w-28" />
+                    {/*
+                      `bg-line` is a pale hairline meant for the page ground; on
+                      this band it measures 11.64:1 and reads as a bright bar
+                      rather than an absent one. A placeholder should recede, so
+                      on this surface it is the band's own text colour held very
+                      low - dim in both themes, because it is derived from the
+                      token that already inverts.
+                    */}
+                    <Skeleton className="h-9 w-20 bg-on-surface-contrast/15" />
+                    <Skeleton className="h-3 w-28 bg-on-surface-contrast/15" />
                   </div>
                 ))
               : stats.map((stat, i) => (
@@ -84,11 +97,19 @@ export function ImpactBand() {
                         semantics, so the visual order is set by flex-col-reverse
                         rather than by reordering the elements.
                       */}
+                      {/*
+                        Both tokens come off the band's own colour rather than
+                        `ink`/`muted`, which are page-ground colours and measure
+                        1.20:1 and ~1.9:1 here - invisible on the light band.
+
+                        The label is the same colour held at 70%, not a separate
+                        tone: one value to keep in step instead of two, and it
+                        still measures ~8:1 in light and ~9:1 in dark, well over
+                        the 4.5 floor for the smallest text on this surface.
+                      */}
                       <div className="flex flex-col-reverse gap-1">
-                        <dt className="text-sm text-muted">{stat.label}</dt>
-                        <dd className="font-display text-3xl leading-none text-ink">
-                          {stat.value}
-                        </dd>
+                        <dt className="text-sm text-on-surface-contrast/70">{stat.label}</dt>
+                        <dd className="font-display text-3xl leading-none">{stat.value}</dd>
                       </div>
                     </div>
                   </Reveal>

@@ -28,6 +28,15 @@
   --secondary: #a63a3a;
 
   /*
+   * The contrasting band (the impact strip). Deeper than `ink` so the section
+   * reads as a change of surface, with `canvas` as its copy at 13.72:1.
+   * `--on-surface-contrast` exists so a component can name "text on the band"
+   * without knowing which way the theme inverts. See src/app/theme.ts.
+   */
+  --surface-contrast: #2a1d16;
+  --on-surface-contrast: var(--canvas);
+
+  /*
    * Frosted-nav fill (PRD 10.5). A translucent canvas, not a new hue: the nav
    * has to read as the page surface with the content blurred behind it. Alpha
    * is high enough that nav labels keep their AA contrast over any hero layer
@@ -132,6 +141,17 @@
   --glass: rgba(18, 18, 18, 0.86);
 
   /*
+   * The band inverts direction here: LIGHTER than the #121212 canvas, because
+   * a dark strip on a dark page is no strip at all. Lifted past `card` so it
+   * still separates where the two meet (1.207:1 vs canvas, 1.098:1 vs card).
+   *
+   * Text needs no inversion in this theme - `ink` already reads on the band at
+   * 13.26:1 - which is exactly what the paired token absorbs.
+   */
+  --surface-contrast: #242424;
+  --on-surface-contrast: var(--ink);
+
+  /*
    * Dark inverts the logic: ink is the light value here, so a darker thread
    * would vanish into the charcoal. The weave is picked out in the theme's own
    * brass instead, which is what a gallery light does to cloth. Held thin and
@@ -164,6 +184,8 @@
   --color-accent-deep: var(--accent-deep);
   --color-secondary: var(--secondary);
   --color-glass: var(--glass);
+  --color-surface-contrast: var(--surface-contrast);
+  --color-on-surface-contrast: var(--on-surface-contrast);
 
   /* Category dye tones (PRD 9.3), theme-independent. */
   --color-indigo: #2e4374;
