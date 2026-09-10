@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 
 import { ADMIN_LOGIN_PATH } from '@/app/adminAuth'
 import { useAdmin } from '@/app/useAdmin'
+import { useScrollReset } from '@/app/useScrollReset'
 import { MockAuthNotice } from '@/components/admin/MockAuthNotice'
 import { Container } from '@/components/layout/Container'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
@@ -31,6 +32,9 @@ const tabClasses = ({ isActive }: { isActive: boolean }): string =>
  * on every surface (PRD 14).
  */
 export default function AdminLayout() {
+  // The desk is outside AppShell and mounts no Lenis, so nothing else would put
+  // a tab switch back at the top of a long queue. Takes the native branch.
+  useScrollReset()
   const { signOut } = useAdmin()
   const navigate = useNavigate()
   const { showToast } = useToast()

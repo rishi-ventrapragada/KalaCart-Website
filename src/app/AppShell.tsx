@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 
 import { MotionProvider } from '@/app/MotionProvider'
 import { useLenis } from '@/app/useLenis'
+import { useScrollReset } from '@/app/useScrollReset'
 import { Footer } from '@/components/layout/Footer'
 import { Navbar } from '@/components/layout/Navbar'
 
@@ -18,6 +19,10 @@ import { Navbar } from '@/components/layout/Navbar'
  */
 export default function AppShell() {
   useLenis()
+  // Sits beside the Lenis mount rather than in MotionProvider: both are about
+  // who owns the scroll position, and the reset goes through the instance this
+  // line creates.
+  useScrollReset()
 
   return (
     <MotionProvider>
