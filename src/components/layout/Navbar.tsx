@@ -77,12 +77,18 @@ export function Navbar() {
     <header
       data-glass={glass ? '' : undefined}
       className={cn(
-        'sticky top-0 z-40 border-b',
+        // The hairline is unconditional. It used to be part of the glass flip,
+        // so at rest on Home the header had no bottom edge at all and the
+        // chrome bled into the page - most visible now that the hero ground
+        // carries a full-strength texture right up under it. The border is a
+        // structural boundary, not a scroll affordance: PRD 10.5 asks the
+        // *fill* to change on scroll, not the edge.
+        'sticky top-0 z-40 border-b border-line-strong',
         // Colour and blur only. Never geometry, and never `transition: all`.
         'transition-[background-color,border-color,backdrop-filter] duration-300 ease-site',
         glass || !onMotionRoute
-          ? 'border-line-strong bg-glass backdrop-blur-md'
-          : 'border-transparent bg-gradient-to-b from-canvas to-transparent',
+          ? 'bg-glass backdrop-blur-md'
+          : 'bg-gradient-to-b from-canvas to-transparent',
       )}
     >
       <Container>

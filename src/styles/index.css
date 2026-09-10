@@ -48,22 +48,32 @@
   --grain-thread: 0.75px;
 
   /*
-   * The DEEP weave: the same bias grain, carried far enough to actually read.
+   * The DEEP weave: the same bias grain, carried as far as AA allows.
    *
    * Same structure as the default weave above - two crossed thread families on
    * the bias - only darker and a touch thicker. It is a separate pair of tokens
    * rather than a change to the defaults because only the hero can afford it:
    * see `.material-field__grain--deep`.
    *
-   * The numbers are matched by measurement, not by eye. Mean ink coverage was
-   * sampled against the rejected knit prototype: 26%/20% at 1.25px lands at 98%
-   * of the knit's luminance drop, where the shipped default sits at 25%. Going
-   * darker still (34% at 1px) hits the same coverage but the diagonals harden
-   * into a grey mesh - the cloth read is carried by thread *weight*, not by ink.
+   * THESE ARE SET BY THE CONTRAST FLOOR, NOT BY EYE. This is the heaviest weave
+   * whose worst-pixel ground still clears 4.5:1 against `muted` body copy behind
+   * the hero's mask: measured 4.547:1. The next step up (14%/11% at 1px) falls
+   * to ~4.4 and fails. An earlier pass shipped 26%/20% at 1.25px, which measures
+   * 4.19-4.32 - visibly the better cloth, and under the floor, which is why it
+   * was pulled back.
+   *
+   * The margin is about 0.05. That is real but thin, and the acceptance sweep
+   * CANNOT see it (see the texture blind-spot entry in CLAUDE.md D), so any
+   * change to `muted`, to the hero copy's size, or to the mask ramp has to be
+   * re-measured by pixel sampling rather than assumed safe.
+   *
+   * Dark is not constrained by this: its grain is brass on charcoal and never
+   * renders darker than the canvas, so it measures 6.71:1 at every weight. Its
+   * values live in the [data-theme='dark'] block and are chosen for looks.
    */
-  --grain-deep-warp: color-mix(in srgb, var(--ink) 26%, transparent);
-  --grain-deep-weft: color-mix(in srgb, var(--ink) 20%, transparent);
-  --grain-deep-thread: 1.25px;
+  --grain-deep-warp: color-mix(in srgb, var(--ink) 13%, transparent);
+  --grain-deep-weft: color-mix(in srgb, var(--ink) 10%, transparent);
+  --grain-deep-thread: 0.9px;
 
   /* The one easing curve for every transition on the site (PRD 9.7). */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
