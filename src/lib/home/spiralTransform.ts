@@ -39,11 +39,11 @@ export interface CardTransform {
   zIndex: number
 }
 
-const clamp = (value: number, min: number, max: number): number =>
+export const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), max)
 
 /** Positive modulo, so a card wrapping past the end lands back at the start. */
-const modulo = (value: number, divisor: number): number =>
+export const modulo = (value: number, divisor: number): number =>
   ((value % divisor) + divisor) % divisor
 
 const smoothstep = (min: number, max: number, value: number): number => {
@@ -75,46 +75,64 @@ export function fittedRadius(radius: number, width: number, fit: number): number
 }
 
 /**
- * Bounds on the perspective foreshortening.
+ * Paint order for one card: depth first, centrality to break the tie.
  *
- * These are a geometry contract, not styling: see `maxCardExtent` and the note
- * inside `cardTransform`. The front card may grow by at most 12%, which is
- * enough to read as nearer without eating the gap to its neighbour.
+ * Depth is `cos(angle)`, and cosine is symmetric, so the cards at `+k` and `-k`
+ * positions from centre sit at *exactly* the same z on every frame. Depth alone
+ * therefore cannot order them, and whatever resolves that tie decides which of
+ * the two is drawn on top when they overlap.
+ *
+ * The source resolved it with `+ index`, i.e. by position in the array. That is
+ * arbitrary - it has nothing to do with where the card is on the helix - and it
+ * flips whenever a card wraps, which is what made overlapping cards cut across
+ * each other on scattered frames instead of sliding under.
+ *
+ * Centrality resolves it by *how close to the front of the run* a card is, which
+ * is the property that should win: of two cards at equal depth, the one nearer
+ * the middle of the visible spiral is the one the eye reads as nearer. It is
+ * also continuous in `offset`, so the order changes by sliding rather than by
+ * popping. The centrality term is scaled to stay well under one depth step, so
+ * it can only ever separate a tie, never reorder genuinely different depths.
  */
-const DEPTH_SCALE_MIN = 0.8
-const DEPTH_SCALE_MAX = 1.12
+export function depthOrderKey(
+  z: number,
+  responsiveRadius: number,
+  offset: number,
+  count: number,
+): number {
+  const depth = (z / Math.max(responsiveRadius, 1) + 1) / 2
+  const centrality = 1 - Math.min(Math.abs(offset) / Math.max(count / 2, 1), 1)
+  return Math.round(depth * 100000 + centrality * 999)
+}
+
+/**
+ * Bounds on the perspective foreshortening, and the depth read itself: a front
+ * card renders about 1.6x the height of one at the back, which is what makes
+ * the helix look like a helix rather than a flat ring of even tiles.
+ *
+ * The first port clamped these to (0.8, 1.12) to satisfy a no-overlap rule,
+ * flattening that ratio to 1.37x and leaving fade and blur to carry a cue scale
+ * should have carried. Overlap is not the failure - see `frontCardIsClear`.
+ */
+export const DEPTH_SCALE_MIN = 0.72
+export const DEPTH_SCALE_MAX = 1.45
 
 /**
  * The largest on-screen height a card can reach, in pixels.
  *
- * Two cards adjacent on the helix sit `verticalSpacing` apart vertically. They
- * therefore cannot overlap - at any rotation, at any point on the circle - so
- * long as that spacing is at least this extent. The horizontal swing cannot be
- * relied on to save it: the swing is a sine, so it passes through zero twice a
- * turn, and at those moments vertical separation is the only thing keeping the
- * cards apart.
- *
- * Exported so the caller can assert the invariant against its own geometry
- * rather than discovering a collision by eye.
+ * Still exported, but as a sizing aid rather than as a separation rule: it says
+ * how tall the front card gets, which is what the container has to have room
+ * for. It no longer implies anything about `verticalSpacing`.
  */
 export function maxCardExtent(cardHeight: number, centerScale: number): number {
   return cardHeight * centerScale * DEPTH_SCALE_MAX
 }
 
-/**
- * Whether a geometry can ever place two cards on top of each other.
- *
- * The spiral's whole read depends on cards being discrete objects that float
- * into place and out again. Once neighbours overlap they stop reading as a
- * helix and start reading as a pile being shuffled, which is the one failure
- * this geometry has to be proof against.
+/*
+ * The paint-order invariant that governs this geometry lives in
+ * `spiralInvariant.ts` - it replays these maths across a full cycle and judges
+ * the result, which is verification rather than placement.
  */
-export function hasCardSeparation(
-  geometry: SpiralGeometry,
-  cardHeight: number,
-): boolean {
-  return geometry.verticalSpacing >= maxCardExtent(cardHeight, geometry.centerScale)
-}
 
 /**
  * Place one card. `progress` is the spiral's rotation in card-widths: advancing
@@ -172,7 +190,6 @@ export function cardTransform(
     DEPTH_SCALE_MAX,
   )
   const y = offset * verticalSpacing * fit
-  const depth = (z / Math.max(responsiveRadius, 1) + 1) / 2
 
   return {
     transform:
@@ -180,6 +197,6 @@ export function cardTransform(
       `scale(${(scale * depthScale).toFixed(4)})`,
     opacity,
     blur: edgeBlur * smoothstep(0.35, 1, edge),
-    zIndex: Math.round(depth * 100000) + index,
+    zIndex: depthOrderKey(z, responsiveRadius, offset, count),
   }
 }

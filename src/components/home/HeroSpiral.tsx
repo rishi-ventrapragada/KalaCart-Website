@@ -5,13 +5,20 @@ import { RemoteImage } from '@/components/ui/RemoteImage'
 import { getProducts } from '@/lib/data'
 import { useAsyncData } from '@/lib/data/useAsyncData'
 import { orderForSpiral } from '@/lib/home/spiralOrder'
-import { hasCardSeparation, type SpiralGeometry } from '@/lib/home/spiralTransform'
+import { frontCardIsClear } from '@/lib/home/spiralInvariant'
+import { type SpiralGeometry } from '@/lib/home/spiralTransform'
 
-/** Enough to read as endless, few enough that every card is a real listing. */
-const CARD_COUNT = 8
+/**
+ * Ten cards, which is the source's own count and what fills the helix.
+ *
+ * Density comes from `verticalSpacing` and card size, not from this number: the
+ * helix is taller than its box either way, so extra cards extend it into the
+ * masked ends rather than tightening what you can see.
+ */
+const CARD_COUNT = 10
 
-const CARD_WIDTH = 112
-const CARD_HEIGHT = 112
+const CARD_WIDTH = 104
+const CARD_HEIGHT = 104
 
 /**
  * The helix. Frozen at module scope rather than built per render: it is the
@@ -19,41 +26,41 @@ const CARD_HEIGHT = 112
  * loop down and restart it, resetting the rotation to zero every time Home
  * re-renders.
  *
- * `verticalSpacing` is the load-bearing number. It must stay at or above the
- * largest on-screen height a card can reach, or neighbours collide as they come
- * round the front - the cards stop reading as objects on a helix and start
- * reading as a stack being shuffled. The first pass had 132px cards rising only
- * 58px, which overlapped them by 74px at rest and by 125px at the front of the
- * turn: an overlap on every single frame. Spacing now clears the card at its
- * largest, so the separation holds at every rotation.
+ * These sit close to the source's defaults (radius 170, 100px cards, spacing
+ * 60, 7 per turn, centre scale 1.2) because that is the density the spiral is
+ * designed around: cards overlap by about 60% at the tightest, which is what
+ * packs them into a helix instead of spreading them into a thin ribbon.
  *
- * The horizontal swing cannot be relied on to keep them apart. It is a sine, so
- * twice a turn it passes through zero - and at exactly those moments a card is
- * directly above its neighbour with only this spacing between them.
+ * An earlier pass read that overlap as a collision and pushed `verticalSpacing`
+ * to 140 to eliminate it. That removed the overlap and the spiral with it - the
+ * cards spread over 980px of travel inside a 544px box, so barely half of them
+ * were ever visible at once. Overlap is the depth cue here; what actually
+ * needed fixing was the *order* it is painted in, which `frontCardIsClear`
+ * now guards.
  */
 const GEOMETRY: SpiralGeometry = {
-  radius: 150,
-  verticalSpacing: 140,
-  cardsPerTurn: 6,
+  radius: 165,
+  verticalSpacing: 56,
+  cardsPerTurn: 7,
   perspective: 1000,
-  centerScale: 1.08,
-  edgeFade: 0.32,
-  edgeBlur: 5,
+  centerScale: 1.2,
+  edgeFade: 0.3,
+  edgeBlur: 6,
 }
 
 /*
- * The no-overlap contract, checked at module load in development.
+ * The paint-order contract, checked at module load in development.
  *
- * The geometry above is hand-tuned, and the failure it guards against is one
- * that looks like a design choice rather than a bug - overlapping cards read as
- * a deliberate stack, so nobody files it. Asserting it here means a later tweak
- * to spacing, card size or centre scale fails loudly at the source instead of
- * being noticed weeks later in a screenshot.
+ * The failure this guards against looks like a rendering glitch rather than a
+ * geometry mistake: on scattered frames two overlapping cards swap which is on
+ * top, so they appear to merge for an instant. Nobody files that as a bug in
+ * the numbers, because the numbers look fine. Asserting it here means a later
+ * change to spacing, card count or turn size fails loudly at the source.
  */
-if (import.meta.env.DEV && !hasCardSeparation(GEOMETRY, CARD_HEIGHT)) {
+if (import.meta.env.DEV && !frontCardIsClear(GEOMETRY, CARD_COUNT)) {
   throw new Error(
-    'HeroSpiral: verticalSpacing is too small for the card size and centreScale — ' +
-      'cards will overlap as they come round the front of the helix.',
+    'HeroSpiral: the front card is painted under a card it overlaps — ' +
+      'cards will appear to merge as they come round the front of the helix.',
   )
 }
 

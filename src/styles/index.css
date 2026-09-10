@@ -432,10 +432,12 @@ p {
   perspective: 1000px;
   pointer-events: none;
   /*
-   * The helix is taller than its box - eight cards at 58px of rise is about
-   * 460px of travel, and cards wrap from top to bottom through the ends. Fading
-   * the ends rather than hard-clipping them means a card leaves and re-enters
-   * through a soft edge instead of popping at a visible boundary.
+   * The helix is taller than its box - ten cards at 56px of rise is about
+   * 635px of travel in a 544px column, and cards wrap from top to bottom
+   * through the ends. That overrun is deliberate: the spiral should run past
+   * the frame rather than sit inside it. Fading the ends rather than
+   * hard-clipping them means a card leaves and re-enters through a soft edge
+   * instead of popping at a visible boundary.
    */
   -webkit-mask-image: linear-gradient(
     to bottom,
