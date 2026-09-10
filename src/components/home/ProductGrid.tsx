@@ -1,7 +1,7 @@
 import { ProductCard } from '@/components/product/ProductCard'
 import { SectionHeader } from '@/components/home/SectionHeader'
 import { Container } from '@/components/layout/Container'
-import { Reveal } from '@/components/motion/Reveal'
+import { useGridReveal } from '@/components/motion/useGridReveal'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -21,6 +21,22 @@ const FEATURED_COUNT = 8
 const fetchNewest = () => getProducts({ sort: 'newest' })
 
 /**
+ * Cards per row, which is NOT one number: the grid is `grid-cols-2` and becomes
+ * `lg:grid-cols-4`, so measured, it renders 2 columns at 360 and 768 and 4 at
+ * 1280. The entrance stagger wraps per row, so a hardcoded 4 would run the
+ * cascade against a row that does not exist at the two narrow widths.
+ *
+ * Read from a media query matching Tailwind's `lg`, so it tracks the class
+ * beside it. Both have to change together.
+ */
+const LG_QUERY = '(min-width: 1024px)'
+const COLUMNS_BASE = 2
+const COLUMNS_LG = 4
+
+/** Seconds between one card's entrance and the next. ~80ms, the PRD 10.3 beat. */
+const STAGGER = 0.08
+
+/**
  * Featured products (PRD 11.2). The first surface carrying real photography,
  * so it sets the card pattern Browse reuses in Increment 9.
  */
@@ -32,6 +48,16 @@ export function ProductGrid() {
   const failed = products.state === 'error' || categories.state === 'error'
   const loading = products.state === 'loading' || categories.state === 'loading'
   const featured = (products.data ?? []).slice(0, FEATURED_COUNT)
+
+  // Keyed off the rendered card count, not off mount: the cards do not exist
+  // until the seam read lands, so the entrance is armed when they appear.
+  const { rootRef, setCardRef } = useGridReveal({
+    count: featured.length,
+    stagger: STAGGER,
+    query: LG_QUERY,
+    columns: COLUMNS_LG,
+    columnsBelow: COLUMNS_BASE,
+  })
 
   const retry = (): void => {
     products.retry()
@@ -65,18 +91,19 @@ export function ProductGrid() {
         ) : featured.length === 0 ? (
           <EmptyState title={t('home.products.empty')} />
         ) : (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div ref={rootRef} className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {featured.map((product, i) => (
-              // Stagger runs across the row, not the whole grid: eight cards
-              // each trailing the last by 80ms would take most of a second to
-              // finish, and the tail would still be arriving after the reader
-              // has started reading.
-              <Reveal key={product.id} delay={(i % 4) * 80}>
+              // The entrance is written by GSAP from useGridReveal rather than
+              // by the CSS reveal: the stagger, the rise and the blur-to-focus
+              // all belong to one tween, and two mechanisms owning opacity on
+              // one node is what makes the sweep's reduced-motion check report
+              // phantom failures. Hence no `data-reveal` here.
+              <div key={product.id} ref={setCardRef(i)} className="product-grid__card">
                 <ProductCard
                   product={product}
                   category={(categories.data ?? []).find((c) => c.id === product.categoryId)}
                 />
-              </Reveal>
+              </div>
             ))}
           </div>
         )}

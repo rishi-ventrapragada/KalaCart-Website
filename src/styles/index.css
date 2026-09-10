@@ -596,6 +596,44 @@ p {
   }
 }
 
+/*
+ * THE "RECENTLY LISTED" GRID (adopted under CLAUDE.md §I).
+ *
+ * opacity, y and filter are written by GSAP from useGridReveal, so - like the
+ * craft rail, the hero spiral and the maker fan - nothing here may transition
+ * them: `transition: none` is explicit rather than a zero duration, because
+ * `transition-property` defaults to `all` and one inherited duration silently
+ * reintroduces the lag (CLAUDE.md motion discipline).
+ *
+ * This wrapper carries no layout of its own. The grid places it and the card
+ * inside fills it, so the entrance transform composes over the layout rather
+ * than replacing it - and `ProductCard`'s own colour transition on hover is
+ * untouched, which is the only thing hover is allowed to move here.
+ */
+.product-grid__card {
+  display: flex;
+  will-change: transform, opacity, filter;
+  /* Event-driven transforms never transition. */
+  transition: none;
+}
+
+.product-grid__card > * {
+  flex: 1;
+}
+
+/*
+ * Reduced motion: no tween is ever created (useGridReveal writes the resolved
+ * state with gsap.set and returns before constructing one), so `will-change` is
+ * released - holding a compositor layer per card for a static image is pure
+ * cost - and the blur is cleared outright so a card cannot be left soft.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .product-grid__card {
+    will-change: auto;
+    filter: none;
+  }
+}
+
 /* Visible keyboard focus everywhere (CLAUDE.md law 7). */
 :focus-visible {
   outline: 2px solid var(--accent);
