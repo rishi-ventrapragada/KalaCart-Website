@@ -127,6 +127,8 @@ Run against a **branch or a restored copy first**, never straight at prod.
    Admin API (`supabase.auth.admin.createUser`) or the dashboard — direct
    `INSERT INTO auth.users` skips identity/credential setup and produces users
    that cannot sign in. Key on **email**.
+   *STRUCK 2026-09-11 — do not mint auth.users. See
+   memory/auth-bridge-execution-plan.md, Phase 1.*
 3. **Backfill the join:**
    ```sql
    -- NOT APPLIED — proposal only
@@ -371,6 +373,8 @@ because it will outlast the code work.
 2. Delete fixtures (separate change).
 3. Add `profiles.auth_user_id` (§2).
 4. Create the 5 `auth.users` via Admin API; backfill; verify (§3).
+   *STRUCK 2026-09-11 — do not mint auth.users. See
+   memory/auth-bridge-execution-plan.md, Phase 1.*
 5. Android: JWT propagation shipped and verified **before** step 6.
 6. Apply corrected policies, drop `*_all` (§4) — on a branch first.
 7. Scope `orders_all` / `messages_all`; add policies for the 7 empty-policy
