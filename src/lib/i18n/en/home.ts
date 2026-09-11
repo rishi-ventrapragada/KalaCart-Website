@@ -46,7 +46,13 @@ export const home = {
     },
     products: {
       heading: 'Recently listed',
-      body: 'New work from approved artisans across six crafts.',
+      /* Deliberately count-free. A literal craft count in this line would sit a
+         few hundred pixels from the impact band, which counts the traditions
+         actually carrying an approved listing - a smaller number while fixtures
+         are still landing craft by craft. Two different numbers for the same
+         thing on one page reads as an error, and this phrasing stays true at
+         every fixture count. */
+      body: "New work from approved artisans across India's craft traditions.",
       error: 'Could not load crafts.',
       seeAll: 'Browse all crafts',
       empty: 'No crafts are listed yet.',

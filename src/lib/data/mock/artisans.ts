@@ -2,7 +2,9 @@ import type { Artisan } from '@/lib/data/types'
 import { artisanPhoto } from '@/lib/data/mock/images'
 
 /**
- * Nine artisans across six crafts, with real craft-region pairings. The status
+ * Nine artisans across five of the taxonomy's crafts, with real craft-region
+ * pairings. Four crafts (Wood Craft, Jewellery, Leather, Stone Art) have no
+ * artisan yet and gain one when their fixtures land. The status
  * mix is deliberate: five approved so buyer surfaces have content, three
  * pending so the admin queue has real work, one rejected so the queue's
  * outcomes are visible in analytics.
@@ -55,7 +57,8 @@ export const artisans: Artisan[] = [
   {
     id: 'a5',
     name: 'Mohammed Yusuf Chhipa',
-    categoryId: 'c5',
+    // Block printing is textile work; c5 was retired into c1 with the taxonomy.
+    categoryId: 'c1',
     region: 'Bagru, Rajasthan',
     photoUrl: artisanPhoto('a5'),
     phone: '+919876543205',

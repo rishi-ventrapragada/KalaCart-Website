@@ -23,12 +23,12 @@ interface BarChartCardProps {
  * Artisans by craft (PRD 11.8).
  *
  * Horizontal bars rather than vertical columns because the labels are craft
- * names, not dates: "Brassware and Dhokra" under a vertical column has to be
- * rotated or truncated, and at 360px that is unreadable. Lying the bars down
- * gives every label a full line at any width.
+ * names, not dates: a label like "Wood Craft" or "Jewellery" under a vertical
+ * column has to be rotated or truncated, and at 360px that is unreadable. Lying
+ * the bars down gives every label a full line at any width.
  *
  * Laid out with CSS rather than SVG, which an earlier draft used. A bar chart
- * of six rows is a list of divs with widths - the SVG version needed a
+ * of one row per craft is a list of divs with widths - the SVG version needed a
  * non-uniform `preserveAspectRatio` to stretch, which would have distorted any
  * `<text>` inside it, forcing the labels out into a separate list where they no
  * longer sat beside their own bars. CSS keeps label, bar and value on one row,

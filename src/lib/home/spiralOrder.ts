@@ -7,18 +7,25 @@ import type { Product } from '@/lib/data'
  * frames were checked by eye at the sizes the spiral actually renders them
  * (~130px at the front, ~88px at the back):
  *
- * - Blue Pottery, Madhubani and Brassware are shot close, one object filling
- *   the frame. They stay legible all the way down.
- * - Handloom, Block Printing and Bamboo are shot wide - an artisan at a loom,
- *   a printer over a table, a vendor in a stall. The craft is somewhere in a
- *   busy scene, and below about 110px it dissolves into an indistinct
+ * - Pottery (c2), Paintings (c3) and Metal Art (c4) are shot close, one object
+ *   filling the frame. They stay legible all the way down.
+ * - Handloom (c1) and Bamboo (c6) are shot wide - an artisan at a loom, a
+ *   printer over a table, a vendor in a stall. The craft is somewhere in a busy
+ *   scene, and below about 110px it dissolves into an indistinct
  *   brown-and-cream texture. Block printing at 88px is a blue rectangle.
+ *
+ * The taxonomy rename does not disturb this. The ids kept their photo pools, so
+ * the finding is about the same frames it was always about - and the block
+ * print frames that were c5 are now part of c1, which is already classified as
+ * scenes, so they stay behind exactly where they were.
  *
  * So the ordering puts object-forward frames where the spiral is large and
  * sharp, and lets the scene frames sit toward the back where the edge blur is
- * already abstracting them into colour and depth. Nothing is excluded: all six
- * crafts appear, which matters for a platform whose pitch is the breadth of
- * what it carries.
+ * already abstracting them into colour and depth. Nothing is excluded: every
+ * craft with listings appears, which matters for a platform whose pitch is the
+ * breadth of what it carries. The four crafts still awaiting fixtures never
+ * reach here - this reads products, not categories - and each will need
+ * classifying by eye when its frames land.
  *
  * This is a per-photo ordering choice within the existing pool. It changes no
  * fixture, and Browse and the featured grid - which render at full card size,

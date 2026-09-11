@@ -91,7 +91,9 @@ export function CraftRail() {
   if (state === 'loading') {
     return (
       <div className="flex justify-center gap-5 overflow-hidden px-4 sm:px-6">
-        {[0, 1, 2, 3, 4, 5].map((i) => (
+        {/* One per craft in the taxonomy, so the placeholder row is the width
+            the real row resolves to rather than jumping when it loads. */}
+        {Array.from({ length: 9 }, (_, i) => (
           <Skeleton key={i} className="h-[8.5rem] w-[15rem] shrink-0 rounded-card" />
         ))}
       </div>

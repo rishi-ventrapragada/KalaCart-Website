@@ -29,21 +29,40 @@
  * `unknownId` below.
  */
 
-/** Six to a craft, so a five-image gallery never repeats a frame. */
+/**
+ * Six to a craft, so a five-image gallery never repeats a frame.
+ *
+ * Keyed by category id, and the ids here are the ones in `categories.ts`. Four
+ * crafts in that taxonomy (c7 Wood Craft, c8 Jewellery, c9 Leather, c10 Stone
+ * Art) deliberately have NO pool yet: they came from the real Supabase table
+ * and their fixtures land one craft at a time, each with its own set of frames
+ * verified by eye. Their absence is safe because this module is reached through
+ * a product's categoryId, so a craft with no products never looks one up - and
+ * the moment a product does name one, `unknownId` throws at import rather than
+ * letting it borrow another craft's photographs. That throw is the guardrail
+ * working, not a fault to route around.
+ */
 const byCategory = {
-  // Handloom Textiles — Indian weavers at pit and frame looms, and a dye yard.
-  c1: [38556299, 32673642, 14953193, 31508152, 34395785, 4253609],
-  // Blue Pottery — Jaipur cobalt-on-white work. Short by design: see the note
-  // above `gallery`. Everything else the search offered was terracotta,
-  // Turkish, or unplaceable, and a wrong frame costs more than a repeated one.
+  // Handloom — Indian weavers at pit and frame looms, a dye yard, and the six
+  // block-print frames that were c5 before Block Printing was absorbed into
+  // this craft: Jaipur printers, block carvers, Ajrakh drying in Ajrakhpur.
+  // Block printing IS textile work, so the frames are correct where they now
+  // sit, and twelve to a pool only widens the gallery variety.
+  c1: [
+    38556299, 32673642, 14953193, 31508152, 34395785, 4253609,
+    7037689, 57565, 4566670, 28389703, 15020640, 39180709,
+  ],
+  // Pottery — Jaipur cobalt-on-white work. Short by design: see the note above
+  // `gallery`. Everything else the search offered was terracotta, Turkish, or
+  // unplaceable, and a wrong frame costs more than a repeated one. Widening
+  // this pool is worthwhile now the craft is no longer specifically *Blue*
+  // Pottery, but only with frames checked the same way.
   c2: [33575396, 33575397, 34022881],
-  // Madhubani Painting — Mithila panels and Indian folk-art stalls.
+  // Paintings — Mithila panels and Indian folk-art stalls.
   c3: [34961656, 165891, 22820070, 10653309, 36817155, 22820072],
-  // Brassware and Dhokra — Dhokra vessels, Indian brass deities, a bronze caster.
+  // Metal Art — Dhokra vessels, Indian brass deities, a bronze caster.
   c4: [39032263, 34504204, 12573352, 33311200, 26792961, 33311188],
-  // Block Printing — Jaipur printers, block carvers, Ajrakh drying in Ajrakhpur.
-  c5: [7037689, 57565, 4566670, 28389703, 15020640, 39180709],
-  // Bamboo and Cane — Indian basket makers and their stock.
+  // Bamboo — Indian basket makers and their stock.
   c6: [18358177, 12940501, 34878662, 14224817, 35264910, 14367748],
 } as const satisfies Record<string, readonly number[]>
 
@@ -58,12 +77,13 @@ const byCategory = {
  * photograph under the wrong craft does not look broken to anyone who does not
  * already know the taxonomy.
  *
- * Unreachable while the fixtures cover exactly c1-c6, which is the point: the
- * cost of a silent fallback is paid later, when the taxonomy grows and the new
- * craft quietly wears the old one's photographs. Both call sites run at module
- * scope (`products.ts` maps over its seeds, `artisans.ts` calls per literal), so
- * a throw surfaces as an import-time failure with the offending id named - not
- * as a crash mid-render.
+ * Reachable as soon as a product names one of the four crafts that have no pool
+ * yet, which is exactly the point: the cost of a silent fallback is paid later,
+ * when the taxonomy grows and the new craft quietly wears the old one's
+ * photographs. The taxonomy has now grown, so this is live. Both call sites run
+ * at module scope (`products.ts` maps over its seeds, `artisans.ts` calls per
+ * literal), so a throw surfaces as an import-time failure with the offending id
+ * named - not as a crash mid-render.
  */
 const unknownId = (kind: string, id: string, known: readonly string[]): never => {
   throw new Error(

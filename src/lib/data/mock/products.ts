@@ -82,19 +82,21 @@ const productSeeds: ProductSeed[] = [
     title: 'Brass oil lamps, pair',
     description:
       'A matched pair of deepam lamps with a broad base, finished by hand rather than machine-buffed.' },
-  { id: 'p17', artisanId: 'a5', categoryId: 'c5', priceInr: 5600, images: 5, status: 'approved', createdAt: '2025-02-01T10:00:00.000Z',
+  // p17-p20 are block printing, which the taxonomy now files under Handloom
+  // (c1) as textile work; c5 is retired.
+  { id: 'p17', artisanId: 'a5', categoryId: 'c1', priceInr: 5600, images: 5, status: 'approved', createdAt: '2025-02-01T10:00:00.000Z',
     title: 'Bagru dabu print bedcover',
     description:
       'Mud-resist printed with hand-cut teak blocks and dyed in indigo. Double bed size with two pillow covers.' },
-  { id: 'p18', artisanId: 'a5', categoryId: 'c5', priceInr: 1200, images: 4, status: 'approved', createdAt: '2025-03-17T10:00:00.000Z',
+  { id: 'p18', artisanId: 'a5', categoryId: 'c1', priceInr: 1200, images: 4, status: 'approved', createdAt: '2025-03-17T10:00:00.000Z',
     title: 'Indigo block print stole',
     description:
       'Fine cotton mul printed in a small buti repeat, soft enough to fold into a bag and carry all day.' },
-  { id: 'p19', artisanId: 'a5', categoryId: 'c5', priceInr: 1450, images: 3, status: 'approved', createdAt: '2025-05-08T10:00:00.000Z',
+  { id: 'p19', artisanId: 'a5', categoryId: 'c1', priceInr: 1450, images: 3, status: 'approved', createdAt: '2025-05-08T10:00:00.000Z',
     title: 'Hand block napkins, set of six',
     description:
       'Six cotton napkins in madder red on off-white, printed with a border block along one edge.' },
-  { id: 'p20', artisanId: 'a5', categoryId: 'c5', priceInr: 1900, images: 4, status: 'approved', createdAt: '2025-06-25T10:00:00.000Z',
+  { id: 'p20', artisanId: 'a5', categoryId: 'c1', priceInr: 1900, images: 4, status: 'approved', createdAt: '2025-06-25T10:00:00.000Z',
     title: 'Dabu print cotton yardage',
     description:
       'Two and a half metres of dabu-printed cotton, enough for one adult kurta, sold as uncut yardage.' },

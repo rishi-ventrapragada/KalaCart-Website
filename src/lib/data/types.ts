@@ -16,7 +16,13 @@ export type Status = 'pending' | 'approved' | 'rejected'
  * is the data contract, so it lists only tones a category may actually hold;
  * see the note beside `sage` before widening it.
  *
- * Many-to-one by design: six categories currently share four tones.
+ * Many-to-one by design: nine categories currently share four tones, and the
+ * distribution is deliberately uneven. Grouping is by MATERIAL FAMILY - indigo
+ * for textile/dyed, madder for painted and worked-surface work, brass for
+ * metal and fired, marigold for plant fibre - so brass carries four of the
+ * nine. Evening it out would mean either grouping by something other than
+ * material or inventing a fifth tone, and the fifth tone in `dyes` (`sage`) is
+ * deliberately absent from this union: see the note above.
  */
 export type Dye = 'indigo' | 'madder' | 'marigold' | 'brass'
 
@@ -25,6 +31,17 @@ export interface Category {
   name: string
   slug: string
   dye: Dye
+  /**
+   * The emoji the real Supabase `categories.icon` column carries, populated in
+   * all 12 live rows. Mirrored here so the mock and the backend agree on the
+   * shape of a category.
+   *
+   * Its sibling column `image_url` is deliberately NOT modelled: it exists in
+   * the schema but is null in ten rows and empty string in the other two, so a
+   * field for it would be a promise the data cannot keep. Add it when it
+   * carries URLs.
+   */
+  icon: string
 }
 
 /**
