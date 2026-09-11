@@ -44,6 +44,9 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
         <Link to="/browse" onClick={onClose} className="rounded-card px-2 py-2 text-sm text-ink">
           {t('nav.browse')}
         </Link>
+        <Link to="/artisans" onClick={onClose} className="rounded-card px-2 py-2 text-sm text-ink">
+          {t('nav.artisans')}
+        </Link>
         <Link
           to="/admin"
           onClick={onClose}

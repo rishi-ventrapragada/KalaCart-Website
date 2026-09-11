@@ -27,6 +27,9 @@ export function Footer() {
             <Link to="/browse" className="text-sm text-muted transition-colors duration-200 ease-site hover:text-ink">
               {t('nav.browse')}
             </Link>
+            <Link to="/artisans" className="text-sm text-muted transition-colors duration-200 ease-site hover:text-ink">
+              {t('nav.artisans')}
+            </Link>
           </Reveal>
         </div>
 

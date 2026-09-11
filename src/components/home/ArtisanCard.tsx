@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 
 import { RemoteImage } from '@/components/ui/RemoteImage'
 import type { Artisan, Category } from '@/lib/data'
+import { useT } from '@/lib/i18n'
 import { cn } from '@/lib/utils/cn'
 
 interface ArtisanCardProps {
@@ -18,6 +19,16 @@ interface ArtisanCardProps {
    * the card links to carries it in full.
    */
   compact?: boolean
+  /**
+   * Show how many crafts this artisan has listed, for the directory.
+   *
+   * Off by default. `productCount` is already on the type and already returned
+   * by `getAllArtisans`, but Home's five cards are a taste of the makers rather
+   * than an inventory, and a count there invites comparing them. On the
+   * directory it is the one fact that helps a buyer choose whose profile to
+   * open, so it is opt-in per surface rather than always on.
+   */
+  showCount?: boolean
 }
 
 /**
@@ -29,14 +40,24 @@ interface ArtisanCardProps {
  * shot, and these are people. PRD 9.5 governs controls and containers; a
  * portrait is neither.
  */
-export function ArtisanCard({ artisan, category, compact = false }: ArtisanCardProps) {
+export function ArtisanCard({
+  artisan,
+  category,
+  compact = false,
+  showCount = false,
+}: ArtisanCardProps) {
+  const t = useT()
+  const count = artisan.productCount
+
   return (
     <Link
       to={`/artisan/${artisan.id}`}
       className={cn(
         'group flex flex-col items-center gap-3 rounded-card border border-line bg-card text-center',
         'transition-colors duration-200 ease-site hover:border-accent',
-        compact ? 'size-full justify-center gap-2.5 p-4' : 'p-5',
+        // `h-full` on the default variant so a directory row's cards match
+        // height whatever their names wrap to; the fan already sizes its own.
+        compact ? 'size-full justify-center gap-2.5 p-4' : 'h-full justify-center p-5',
       )}
     >
       <RemoteImage
@@ -63,6 +84,18 @@ export function ArtisanCard({ artisan, category, compact = false }: ArtisanCardP
         </h3>
         {category && <p className="text-2xs text-muted">{category.name}</p>}
         {!compact && <p className="text-2xs text-muted">{artisan.region}</p>}
+        {/*
+          `productCount` is optional on the type, so an undefined count renders
+          nothing rather than "undefined listings" - a provider that does not
+          compute it must not put a broken line on the card.
+        */}
+        {showCount && count !== undefined && (
+          <p className="mt-1 text-2xs text-muted">
+            {count === 1
+              ? t('artisans.results.listingsOne')
+              : t('artisans.results.listings', { count })}
+          </p>
+        )}
       </div>
     </Link>
   )

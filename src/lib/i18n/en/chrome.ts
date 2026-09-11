@@ -3,6 +3,7 @@ export const chrome = {
   nav: {
     home: 'Home',
     browse: 'Browse',
+    artisans: 'Artisans',
     admin: 'Admin',
     searchPlaceholder: 'Search crafts',
     openMenu: 'Open menu',

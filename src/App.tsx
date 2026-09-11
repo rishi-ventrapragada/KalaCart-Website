@@ -9,6 +9,7 @@ import ArtisanManagement from '@/routes/admin/ArtisanManagement'
 import { RequireAdmin } from '@/routes/admin/RequireAdmin'
 import VerificationQueue from '@/routes/admin/VerificationQueue'
 import ArtisanProfile from '@/routes/ArtisanProfile'
+import Artisans from '@/routes/Artisans'
 import Browse from '@/routes/Browse'
 import Home from '@/routes/Home'
 import NotFound from '@/routes/NotFound'
@@ -28,6 +29,9 @@ export default function App() {
           <Route element={<AppShell />}>
             <Route path="/" element={<Home />} />
             <Route path="/browse" element={<Browse />} />
+            {/* The directory, above the per-artisan route so the two read in
+                order; they cannot collide, `/artisans` being its own path. */}
+            <Route path="/artisans" element={<Artisans />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/artisan/:id" element={<ArtisanProfile />} />
             <Route path="*" element={<NotFound />} />

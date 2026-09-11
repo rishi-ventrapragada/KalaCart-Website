@@ -1,4 +1,5 @@
 import { admin } from '@/lib/i18n/en/admin'
+import { artisans } from '@/lib/i18n/en/artisans'
 import { browse } from '@/lib/i18n/en/browse'
 import { catalog } from '@/lib/i18n/en/catalog'
 import { chrome } from '@/lib/i18n/en/chrome'
@@ -31,6 +32,7 @@ export const en = {
   ...chrome,
   ...home,
   ...browse,
+  ...artisans,
   ...catalog,
   ...admin,
   ...system,

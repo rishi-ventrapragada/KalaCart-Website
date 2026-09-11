@@ -52,7 +52,9 @@ export function ArtisanRow() {
         <SectionHeader
           heading={t('home.artisans.heading')}
           body={t('home.artisans.body')}
-          linkTo="/browse"
+          // The directory, not Browse. This pointed at /browse, which answered
+          // "see all artisans" with a grid of products.
+          linkTo="/artisans"
           linkLabel={t('home.artisans.seeAll')}
         />
 

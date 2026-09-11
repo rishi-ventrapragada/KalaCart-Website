@@ -32,6 +32,7 @@ const BASE = process.env.AUDIT_BASE ?? 'http://localhost:4173'
 const ROUTES = [
   '/',
   '/browse',
+  '/artisans',
   '/product/p1',
   '/artisan/a1',
   '/no-such-page',

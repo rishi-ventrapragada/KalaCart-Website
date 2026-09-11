@@ -101,6 +101,11 @@ export function Navbar() {
             <NavLink to="/browse" className={linkClasses}>
               {t('nav.browse')}
             </NavLink>
+            {/* A peer of Browse, not a utility: the two are the site's two ways
+                in - by craft, or by the person who made it. */}
+            <NavLink to="/artisans" className={linkClasses}>
+              {t('nav.artisans')}
+            </NavLink>
           </div>
 
           <div className="ml-auto flex items-center gap-2">
