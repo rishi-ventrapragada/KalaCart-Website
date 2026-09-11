@@ -3,8 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KalaCart</title>
+    <meta
+      name="description"
+      content="Buy handmade goods straight from Indian artisans. No middlemen, no commission, and the full story of every craft."
+    />
+    <!--
+      Theme colour for mobile browser chrome, one per theme so the address bar
+      matches the canvas the page is actually painting. Values are the literal
+      --canvas of each palette (src/app/theme.ts); the meta tag is read before
+      any stylesheet resolves, so a var() here would not work.
+    -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F6E9DF" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121212" />
+    <!--
+      Link unfurls. Relative image paths are resolved against the page URL by
+      most scrapers but not all - if previews come back blank once there is a
+      production domain, these two want absolute URLs.
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="KalaCart" />
+    <meta
+      property="og:description"
+      content="Buy handmade goods straight from Indian artisans. No middlemen, no commission, and the full story of every craft."
+    />
+    <meta property="og:image" content="/og-image.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!--

@@ -5,6 +5,7 @@ import { Link, NavLink } from 'react-router-dom'
 
 import { prefersReducedMotion } from '@/app/lenis'
 
+import { BrandLockup } from '@/components/brand/BrandLockup'
 import { Container } from '@/components/layout/Container'
 import { MobileMenu } from '@/components/layout/MobileMenu'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
@@ -93,8 +94,13 @@ export function Navbar() {
     >
       <Container>
         <nav aria-label={t('nav.primary')} className="flex h-[4.5rem] items-center gap-6">
-          <Link to="/" className="font-display text-xl tracking-[-0.02em] text-ink">
-            {t('brand.name')}
+          {/*
+            The mark carries no accessible name of its own, so the link is
+            labelled once here - a screen reader hears "KalaCart, home" rather
+            than the name twice over.
+          */}
+          <Link to="/" aria-label={t('brand.home')} className="text-ink">
+            <BrandLockup />
           </Link>
 
           <div className="hidden items-center gap-5 sm:flex">

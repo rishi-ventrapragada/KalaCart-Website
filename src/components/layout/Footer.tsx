@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 
+import { BrandLockup } from '@/components/brand/BrandLockup'
 import { Container } from '@/components/layout/Container'
 import { Reveal } from '@/components/motion/Reveal'
 import { useT } from '@/lib/i18n'
@@ -13,7 +14,7 @@ export function Footer() {
       <Container>
         <div className="flex flex-col gap-8 sm:flex-row sm:justify-between">
           <Reveal className="max-w-sm">
-            <p className="font-display text-lg text-ink">{t('brand.name')}</p>
+            <BrandLockup markSize={22} textClassName="text-lg" className="text-ink" />
             <p className="mt-3 text-sm leading-relaxed text-muted">{t('footer.programLine')}</p>
           </Reveal>
 

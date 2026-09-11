@@ -4,6 +4,7 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ADMIN_HOME_PATH } from '@/app/adminAuth'
 import { useAdmin } from '@/app/useAdmin'
 import { MockAuthNotice } from '@/components/admin/MockAuthNotice'
+import { BrandLockup } from '@/components/brand/BrandLockup'
 import { Container } from '@/components/layout/Container'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -65,6 +66,15 @@ export default function AdminLogin() {
     <Container className="flex justify-center py-16 sm:py-24">
       <div className="flex w-full max-w-md flex-col gap-6">
         <div className="flex flex-col gap-2">
+          {/*
+            This screen sits outside both shells (App.tsx), so it is the one
+            surface with no chrome to carry the brand - a bare sign-in form on
+            an unidentified page. The lockup links home so the doorway is not a
+            dead end for someone who arrived here by mistake.
+          */}
+          <Link to="/" aria-label={t('brand.home')} className="mb-2 self-start text-ink">
+            <BrandLockup />
+          </Link>
           <h1 className="text-3xl">{t('admin.auth.title')}</h1>
           <p className="text-sm text-muted">{t('admin.auth.intro')}</p>
         </div>

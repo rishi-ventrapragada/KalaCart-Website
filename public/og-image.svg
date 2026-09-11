@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <!--
+    Link-unfurl card (1200x630, the Open Graph standard). The horizontal lockup:
+    mark, wordmark, programme line.
+
+    Type is drawn as text in Fraunces with a serif fallback stack. A renderer
+    without Fraunces installed falls back rather than dropping the words, which
+    is the right failure for a preview image - and the wordmark is the brand
+    name, so it must never come out blank.
+
+    Geometry: stroke-linecap="round" pushes the drawn edge 1.8 units past each
+    endpoint, so at scale 5.2 the mark spans x=166.6..299.8 - which is why the
+    tagline starts at 167 and the wordmark at 340, not at the translate origin.
+
+    Colours are the light theme's literal values (canvas #F6E9DF, ink #3C2A21,
+    muted #6B5647, accent #A55133). A scraper has no CSS variables and no theme
+    toggle, so this asset commits to the light palette. Values must be updated
+    by hand if theme.ts changes - flagged in the handoff.
+  -->
+  <rect width="1200" height="630" fill="#F6E9DF"/>
+
+  <!-- A single accent rule, the one large-surface use PRD 9.6 allows. -->
+  <rect x="0" y="0" width="1200" height="10" fill="#A55133"/>
+
+  <g fill="none" stroke="#3C2A21" stroke-width="3.6" stroke-linecap="round" transform="translate(150 258) scale(5.2)">
+    <path d="M11 6 L11 26"/>
+    <path d="M21 6 L21 26"/>
+    <path d="M5 11 L16.4 11"/>
+    <path d="M25.6 11 L27 11"/>
+    <path d="M5 21 L6.4 21"/>
+    <path d="M15.6 21 L27 21"/>
+  </g>
+
+  <text x="340" y="368" font-family="Fraunces, Georgia, 'Times New Roman', serif"
+        font-size="104" font-weight="600" letter-spacing="-2" fill="#3C2A21">KalaCart</text>
+
+  <text x="167" y="448" font-family="'Hanken Grotesk', Helvetica, Arial, sans-serif"
+        font-size="34" fill="#6B5647">Handmade goods, direct from the artisan.</text>
+</svg>

@@ -7,6 +7,13 @@ export const core = {
   brand: {
     /** A proper name, not translated copy. Present so no component hardcodes it. */
     name: 'KalaCart',
+    /**
+     * The accessible name for the logo link in the navbar, footer and admin
+     * header. The mark is `aria-hidden` and the wordmark beside it is not a
+     * label, so without this a screen reader announces the bare name with no
+     * hint that it navigates.
+     */
+    home: 'KalaCart, home',
   },
 
   common: {

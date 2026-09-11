@@ -4,6 +4,7 @@ import { ADMIN_LOGIN_PATH } from '@/app/adminAuth'
 import { useAdmin } from '@/app/useAdmin'
 import { useScrollReset } from '@/app/useScrollReset'
 import { MockAuthNotice } from '@/components/admin/MockAuthNotice'
+import { BrandLockup } from '@/components/brand/BrandLockup'
 import { BackToTop } from '@/components/layout/BackToTop'
 import { Container } from '@/components/layout/Container'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
@@ -52,8 +53,8 @@ export default function AdminLayout() {
       <header className="border-b border-line-strong bg-card">
         <Container>
           <div className="flex h-16 items-center gap-4">
-            <Link to="/" className="font-display text-lg tracking-[-0.02em] text-ink">
-              {t('brand.name')}
+            <Link to="/" aria-label={t('brand.home')} className="text-ink">
+              <BrandLockup markSize={22} textClassName="text-lg" />
             </Link>
             <span aria-hidden className="text-muted">
               /
