@@ -1,26 +1,29 @@
 # Auth bridge execution plan — FOR APPROVAL, NOT APPLIED
 
 *Drafted 2026-09-11 · Project `imprsuvtgqxepwzimqmc` · KalaCart / SIH26090*
-*Status: **plan only**. No SQL run, no policy touched, no row modified.*
+*Status (2026-09-11): **Phases 1, 2 and 4 applied.** Phase 3 decided. Phase 5
+onward still unapplied — no policy has been created, altered or dropped.*
 
 Supersedes the sequencing in `auth-migration-plan.md` §7 where the two differ.
 The design there (add a column, do not re-key) still stands and is not revisited.
 
 ---
 
-## 0. Blocker: no database access in this session
+## 0. Status — connector live, phases 1, 2 and 4 have run
 
-The read-only inventory in phase 1 **cannot be executed right now.** There is no
-Supabase MCP tool available in this session, and `.env.local` carries only
-`VITE_SUPABASE_ANON_KEY` — no service-role key. The anon key cannot read
-`auth.users`, `pg_policies`, or `pg_constraint`, so there is no fallback script.
+*Updated 2026-09-11. Supersedes the earlier blocker note, which said no Supabase
+MCP tool was available and that every count below was the stale 2026-09-10 set.*
 
-Every number quoted below comes from `auth-migration-plan.md`, measured
-2026-09-10 — **before** the Android app migrated to Supabase Auth and before the
-13 fixture profiles were deleted. Both events invalidate the counts.
+The connector is authorized. Phase 1 (inventory) and Phase 2 (match as SELECT)
+have both run read-only; Phase 3 was decided by the owner; Phase 4 (backfill)
+has been **applied by the owner in the Supabase SQL editor**. Results are
+recorded inline under each phase below, and they replace the 2026-09-10 numbers
+carried over from `auth-migration-plan.md`.
 
-**Nothing in phases 1–6 should be run until the connector is re-authorized.**
-The plan is written so that phase 1 refreshes every number first.
+Headline: **3 of 3 remaining profiles are linked, 0 unmapped.** Open item #5 is
+answered and closed. Two items remain before Phase 5 can proceed — the real-JWT
+check on the app side, and a newly found two-join defect in the seller policies
+(see the finding at the top of Phase 5).
 
 ---
 
@@ -28,12 +31,17 @@ The plan is written so that phase 1 refreshes every number first.
 
 `auth-migration-plan.md` opens on two premises that the handoff now contradicts:
 
-| Premise in the plan (2026-09-10) | State today (2026-09-11) |
+| Premise in the plan (2026-09-10) | Measured 2026-09-11 |
 |---|---|
 | Android authenticates against **Firebase** | Migrated to **Supabase Auth** mid-project |
-| 18 `profiles`, 13 of them test fixtures | Fixtures **deleted** — expect ~5 real rows |
-| `auth.users` = 1 | Unknown, expect >= 5 — real users have re-registered |
-| Plan §3: *create* the 5 auth users via Admin API | Likely **already created** by the app |
+| 18 `profiles`, 13 of them test fixtures | **5** at start of Phase 1; fixtures gone |
+| `auth.users` = 1 | **3**, all email, all confirmed |
+| Plan §3: *create* the 5 auth users via Admin API | **Confirmed already created by the app.** The struck step stays struck. |
+
+The last row is the one that mattered. Three real users had already registered
+through the app; minting them via the Admin API would have produced a second
+login per person and broken email uniqueness on the `auth.users` side — the exact
+failure the strike was written to prevent.
 
 This is the single most important correction. The plan's §3 says to *mint*
 `auth.users` rows through the Admin API. If the Android app has already
@@ -46,12 +54,14 @@ second login for the same human, and a match key that is no longer unique.
 
 Three candidate predicates, ranked:
 
-1. **`firebase_uid` → `auth.users.raw_user_meta_data`.** Strongest *if* the
-   Android migration preserved the old UID at signup. Exact, immune to typos
-   and case. Must be checked for first — phase 1 asks explicitly.
-2. **Email.** The plan measured 18 distinct emails across 18 rows, so it was
-   clean; with fixtures gone it should still be. Compare `lower(btrim(...))` on
-   both sides. This is the likely key.
+1. ~~**`firebase_uid` → `auth.users.raw_user_meta_data`.**~~ **RETIRED
+   2026-09-11 — this key does not exist.** The `firebase_uid` column has been
+   **dropped from `profiles` entirely** by the teammate, and no firebase uid
+   appears anywhere in `auth.users.raw_user_meta_data`. There is no exact-UID
+   path; note this also removed the rollback/audit trail that
+   `auth-migration-plan.md` §3 item 5 said to preserve.
+2. **Email — this is what was used.** 3 matched cleanly, no duplicates on
+   either side. Compared as `lower(btrim(...))` on both sides.
 3. **Phone.** Rejected as primary. The plan found 7 profiles sharing
    `+919876543210` and 6 sharing `+919123456780`. Those clusters were entirely
    inside the fixtures, so phone *may* now be clean — but it also carries a
@@ -116,6 +126,36 @@ select relname, relrowsecurity, relforcerowsecurity
 is populated, something has run that neither document records — stop and
 reconcile before anything else.
 
+### Phase 1 results — measured 2026-09-11
+
+| Check | Result |
+|---|---|
+| `profiles` total (at start of phase 1) | **5** |
+| `profiles.firebase_uid` | **column no longer exists** — dropped by the teammate |
+| `profiles.auth_user_id` exists? | **Yes, already present** — FK to `auth.users`, full unique index |
+| …populated? | **0 rows** — column existed but was entirely NULL |
+| `auth.users` total | **3** |
+| …with email / confirmed | **3 / 3** |
+| firebase uid in `raw_user_meta_data` | **None** — neither `firebase_uid` nor `firebaseUid` |
+| RLS enabled on all six tables | **Yes, all six** |
+| `products` / `enquiries` / `orders` / `messages` row counts | **all empty** |
+
+**Three findings worth carrying forward:**
+
+1. **The column already existed, with a *full* unique index** — not the partial
+   `where auth_user_id is not null` index this plan specified in Phase 4a. With
+   0 rows populated the distinction was moot (NULLs are distinct under a plain
+   unique index in Postgres, so multiple NULLs were legal either way), but it
+   was pre-existing work recorded in neither document. The gate's "stop and
+   reconcile" condition was **not** tripped, because the gate turns on the
+   column being *populated*, and it was empty.
+2. **`firebase_uid` is gone**, which retires match-key candidate 1 outright and
+   also removes the audit trail `auth-migration-plan.md` §3 item 5 relied on.
+   Email was the only usable key left.
+3. **All four data tables are empty.** Nothing has leaked and nothing can be
+   lost in the policy swap — Phase 5 is a pre-launch hardening exercise, not an
+   incident response.
+
 ## Phase 2 — Match as SELECT, never UPDATE
 
 No `UPDATE` appears in this phase at all.
@@ -157,6 +197,24 @@ select u.id, u.email, u.created_at
 rows. Any duplicate stops the migration — that is constraint #1, and not
 something to resolve by picking one.
 
+### Phase 2 results — measured 2026-09-11 · **GATE PASSED**
+
+| Metric | Result |
+|---|---|
+| `matches_one` (email matched exactly one auth user) | **3** |
+| `matches_zero` (no auth user) | **2** — Ananya, Nidhi (both sellers) |
+| `matches_many` | **0** ✅ |
+| Duplicate emails in `profiles` | **none** ✅ |
+| Duplicate emails in `auth.users` | **none** ✅ |
+| Auth users with no profile (2d, reverse direction) | **none** |
+
+All three gate conditions held: `matches_many = 0` and both duplicate checks
+returned zero rows. No profile was ambiguous, so constraint #1 — one person's
+profile attaching to another person's login — was never in play.
+
+The reverse direction being empty is its own small result: every `auth.users`
+row had a matching profile, so orphan population (b) turned out not to exist.
+
 ## Phase 3 — Orphan policy, both directions
 
 Two populations, two different answers. **Proposing, not choosing** — both need
@@ -179,6 +237,28 @@ created the `profiles` row.
   profile so the client cannot skip it (migration plan §5 item 3). That is a
   **write-path change, therefore constraint #3** — flagged for the teammate, not
   shipped here.
+
+### Phase 3 decision — 2026-09-11
+
+**Population (b) was empty** (Phase 2d returned no rows), so only (a) needed a
+call.
+
+**Owner chose a third option: delete Ananya and Nidhi.** Neither "leave unmapped"
+nor "mint an account" — the two profiles were removed, and both sellers will
+re-register through the app. Applied in Phase 4 below.
+
+The trade this accepts: deleting a profile cascades (all 12 inbound FKs are
+`ON DELETE CASCADE`, per `auth-migration-plan.md` §2), so their seller rows went
+with them. That was acceptable here **only because `products` is empty** — no
+listing was destroyed. The same decision against a populated `products` table
+would delete real catalogue data, so it should not be treated as reusable
+precedent.
+
+⚠️ **This decision depends on the teammate question below being answered "yes".**
+If the Android app does not create the `profiles` row itself at signup, and no
+trigger does it either, then Ananya and Nidhi **cannot come back** — they will
+sign up, land an `auth.users` row, and have no profile. See the open question at
+the end of this document.
 
 ## Phase 4 — Backfill, then verify identity for real
 
@@ -228,7 +308,109 @@ chain; only a real JWT proves the token path — which is the half that was brok
 **Gate:** if `resolved_uid` is null, **stop.** Every phase-5 policy depends on it
 and applying them would deny-all.
 
+### Phase 4 results — applied 2026-09-11 by the owner, in the Supabase SQL editor
+
+| Step | Result |
+|---|---|
+| Profiles deleted (Phase 3 decision) | **2** — Ananya, Nidhi |
+| …cascaded child rows | **2 `sellers`, 1 `buyers`** |
+| Profiles backfilled | **3** |
+| `unmapped` after backfill | **0** ✅ |
+| Link correctness | **all 3 verified against the correct `auth.users` row** |
+
+4a was a no-op: the column and a unique index already existed (Phase 1). The
+backfill matched `matches_one = 3` from Phase 2b exactly, which is the check
+that authorised the commit.
+
+**⚠️ Phase 4 is not finished. 4c — the real-JWT verification — is still open.**
+
+`unmapped = 0` proves the UPDATE wrote the rows it was meant to. It does **not**
+prove `auth.uid()` resolves for a real request, and treating the row count as if
+it did is precisely the silent failure this phase was written to catch. The half
+that was actually broken is token propagation (`auth-migration-plan.md` §5 item
+2) — the app sending only the anon key — and no SQL-side check can observe that.
+
+**Owner:** to be verified by the teammate signing into the Android app and
+confirming `auth.uid()` returns their uuid over PostgREST. Until that comes back,
+Phase 5 must not start: every policy there resolves through `auth.uid()`, so
+applying them against a client that does not send a JWT denies everything.
+
 ## Phase 5 — Policy swap: scoped on first, `*_all` dropped last
+
+### ⚠️ Finding 2026-09-11: the live seller policies are off by two joins
+
+`auth.uid()` **cannot be compared to `products.seller_id`.** They are values from
+different tables, two joins apart:
+
+```
+auth.users.id
+  = profiles.auth_user_id      (join 1 — the bridge backfilled in Phase 4)
+      profiles.id
+        = sellers.profile_id   (join 2 — products.seller_id references sellers.id,
+                                          NOT profiles.id)
+          sellers.id
+            = products.seller_id
+```
+
+The three existing scoped policies — **"Seller inserts own product"**, **"Seller
+updates own product"**, **"Seller deletes own product"** — test
+`seller_id = auth.uid()` **directly**, skipping both joins. A seller's uuid in
+`auth.users` is not their `sellers.id`, so the predicate compares two unrelated
+uuids and **can never match a single row.** These policies have never worked and
+never could; they have been inert since they were written, which is why the
+permissive `*_all` policies are the only thing granting the app access today.
+
+**Consequence for Phase 5: these three are marked for REPLACEMENT, not reuse.**
+Do not leave them in place alongside the corrected policies on the assumption
+that they are merely redundant. They are dead predicates, and keeping them would
+leave three `drop policy` statements' worth of confusion behind for whoever reads
+`pg_policies` next. Each is dropped by name and recreated against the helper.
+
+The corrected chain lives in the helper functions, which resolve **both** joins
+in one place — this is exactly why the plan uses helpers rather than inlining the
+predicate into each policy:
+
+```sql
+-- join 1: auth.uid() -> profiles.id
+create or replace function public.current_profile_id()
+returns uuid language sql stable security definer
+set search_path = public as $$
+  select p.id from public.profiles p where p.auth_user_id = auth.uid() limit 1;
+$$;
+
+-- join 2: profiles.id -> sellers.id. THIS is the value products.seller_id holds.
+create or replace function public.current_seller_id()
+returns uuid language sql stable security definer
+set search_path = public as $$
+  select s.id from public.sellers s
+   where s.profile_id = public.current_profile_id() limit 1;
+$$;
+```
+
+The drafts in `auth-migration-plan.md` §4 already chain correctly and need no
+change — the defect is in the **live** policies, not the proposals. What changes
+here is that the three live policies are now known-broken rather than
+assumed-fine, so the swap must drop them explicitly:
+
+```sql
+drop policy if exists "Seller inserts product"     on public.products;
+drop policy if exists "Seller updates own product" on public.products;
+drop policy if exists "Seller deletes own product" on public.products;
+```
+
+*(Confirm each policy's exact name against the Phase 1e listing before running —
+names are matched literally and a near-miss silently drops nothing.)*
+
+**One more thing this implies:** any future policy on a table whose `seller_id`
+references `sellers(id)` owes both joins. `orders.seller_id` is the same shape
+(Phase 6). And note the latent inconsistency flagged in
+`auth-migration-plan.md` §2 — `verification_requests.seller_id` points at
+**`profiles(id)`**, not `sellers(id)`, so a policy on that table needs
+`current_profile_id()`, not `current_seller_id()`. Same column name, two
+different meanings, and using the wrong helper fails silently in the same way
+the three product policies already do.
+
+---
 
 Order is the safety property. At no instant is a table left with no policy.
 
@@ -276,11 +458,32 @@ from these policies.
 
 ---
 
-## Open item #5 — the `enquiries` check constraint
+## Open item #5 — the `enquiries` check constraint · ✅ CLOSED 2026-09-11
 
-**A precise answer requires reading the constraint, and that read is blocked**
-with the rest of phase 1. What is needed is the definition itself, not an
-inference:
+**Answer: REJECTED.** An insert sending neither `buyer_id` nor guest contact
+fields is refused by the check constraint **`enquiries_buyer_or_guest_check`**.
+
+Verified empirically, not inferred — a `begin / insert / rollback` probe sending
+only `product_id` and `message` raised a check-constraint violation and was
+rolled back. That distinction matters here: reading the definition alone would
+not have settled it, because a NULL-tolerant CHECK passes on `UNKNOWN`, which is
+the exact trap the question was about. The probe rules that out.
+
+**For the teammate:** the guest-contact path from `20260910072905` has **no gap**.
+The database will not accept an enquiry with no way to contact anybody, so the
+Android app cannot create an unreachable row even if its client-side validation
+misses. If the app *does* currently send such an insert, it is already failing
+against this constraint and needs a client-side fix — but nothing unreachable can
+have landed.
+
+No action needed. Retained below for the record: the queries used, and the
+original reasoning for why a definition read alone was insufficient.
+
+---
+
+*Original investigation notes:*
+
+What is needed is the definition itself, not an inference:
 
 ```sql
 select con.conname, pg_get_constraintdef(con.oid) as definition
@@ -320,9 +523,37 @@ way to contact anyone — worth fixing in the same window.
 
 ## What is needed to proceed
 
-1. **Re-authorize the Supabase connector** (or provide a service-role key).
-   Phases 1–2 are pure reads and can run immediately once it is back.
-2. **Confirm the Android app already created real `auth.users`.** If yes, the
-   Admin-API user-creation step in migration plan §3 is dropped entirely.
-3. **Pick the orphan policy** for direction (a) — leave unmapped, or mint.
-4. Everything after phase 2 waits for review of the phase-2 output.
+*Rewritten 2026-09-11. Items 1–3 of the previous list are all resolved: the
+connector was authorized, the app was confirmed to have created the real
+`auth.users` rows, and the orphan policy was decided (delete).*
+
+**Phase 5 is blocked on two things, both outside this repo:**
+
+1. **Real-JWT verification (Phase 4c).** The teammate signs into the Android app
+   and confirms `auth.uid()` returns their uuid over PostgREST. Until this comes
+   back, applying Phase 5 against a client that sends only the anon key denies
+   every request on all six tables. This is the highest-risk item in the whole
+   migration (`auth-migration-plan.md` §5 item 2).
+2. **Rewriting the three broken product policies** to resolve through both joins
+   — see the finding at the top of Phase 5. They are dropped and recreated, not
+   reused.
+
+### Question for the teammate — blocks the Phase 3 deletions being recoverable
+
+**There is no trigger creating a `profiles` row on `auth.users` insert.** So:
+**does the Android app insert the `profiles` row itself at signup?**
+
+- **If yes** — Ananya and Nidhi re-register in the app, get a fresh `auth.users`
+  row and a fresh profile, and the Phase 3 decision is complete. Worth confirming
+  the app also sets `auth_user_id` on that insert; if it leaves it NULL, they
+  come back with a profile that is once again unbridged and every scoped policy
+  is inert for them.
+- **If no** — **they cannot come back.** They will sign up, land an `auth.users`
+  row, and have no profile, no seller row, and no way to list products. Their old
+  rows were deleted in Phase 4 and the cascade took their seller records with
+  them. The fix would then be the `AFTER INSERT ON auth.users` trigger from
+  `auth-migration-plan.md` §5 item 3 — a **write-path change**, therefore
+  constraint #3, to be coordinated rather than shipped unilaterally.
+
+This question should be answered **before** the teammate tells the two sellers to
+re-register, not after.
