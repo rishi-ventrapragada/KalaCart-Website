@@ -8,7 +8,16 @@
 
 export type Status = 'pending' | 'approved' | 'rejected'
 
-/** Category colour-coding, one dye tone per craft (PRD section 9.3). */
+/**
+ * Category colour-coding, one dye tone per craft (PRD section 9.3).
+ *
+ * Deliberately NARROWER than `dyes` / `DyeName` in `src/app/theme.ts`, which
+ * carries a fifth tone (`sage`) that is a palette colour with no category. This
+ * is the data contract, so it lists only tones a category may actually hold;
+ * see the note beside `sage` before widening it.
+ *
+ * Many-to-one by design: six categories currently share four tones.
+ */
 export type Dye = 'indigo' | 'madder' | 'marigold' | 'brass'
 
 export interface Category {

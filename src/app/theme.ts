@@ -190,8 +190,19 @@ export const themes: Record<ThemeName, ThemeTokens> = {
 
 /**
  * Category colour-coding (PRD 9.3). Theme-independent: these are the one place
- * a multi-colour palette appears, and they match the `Category.dye` union in
- * the data seam.
+ * a multi-colour palette appears.
+ *
+ * This is a SUPERSET of the `Category.dye` union in the data seam, not a match.
+ * The first four are the category tones and correspond 1:1 to `Dye` in
+ * `src/lib/data/types.ts`; `sage` is a palette colour parked here (see below)
+ * and is deliberately NOT assignable to a category.
+ *
+ * The asymmetry is load-bearing, so keep the two derivations straight:
+ * `DyeName` (derived from this object, 5 tones) is the RENDERING palette, while
+ * `Category['dye']` (4 tones) is the DATA CONTRACT with the teammate's Supabase
+ * schema. A component keying off `DyeName` owes a `sage` entry; one keying off
+ * `Category['dye']` must not have one. Widening `Dye` to include `sage` would
+ * let the provider admit a category tone that no category has.
  */
 export const dyes = {
   indigo: '#2E4374',
@@ -199,11 +210,28 @@ export const dyes = {
   marigold: '#C9922B',
   brass: '#B8862F',
   /*
+   * NOT A CATEGORY TONE. Currently unused: nothing renders sage today.
+   *
    * Added 2026-09-10 with the palette revision. The reference palette's sage
    * could not take the `secondary` token - that slot means "something is
    * wrong" (invalid fields, error toasts, reject buttons) and a calm green
    * cannot say that - but it is a real part of the palette, so it lands here,
    * where the dyes are decorative category tones with no contrast floor.
+   *
+   * That is placement by elimination, not by intent: it is parked in the one
+   * block with no contrast floor, which is why it is absent from `Dye` in the
+   * data seam and from every `Record<Category['dye'], …>` map. Only `Chip`
+   * names it, because `Chip` keys off `DyeName` and an exhaustive record will
+   * not compile without it - that entry satisfies the compiler and styles no
+   * craft.
+   *
+   * Before using it for anything, note the constraint that put it here: at
+   * 2.28:1 on canvas it is below the 3:1 boundary floor, so it cannot carry a
+   * border, an icon or any other load-bearing mark - decorative fills only.
+   * A status badge is exactly the use it is unfit for. Giving it a real job
+   * needs a §D decision (CLAUDE.md G, theme seam); making it a 7th category
+   * tone additionally means adding it to `Dye` and to all 12
+   * `Record<Category['dye'], …>` maps across 7 files.
    *
    * Slightly deepened from the reference #8DA38A so it reads as a dye rather
    * than a pastel against the parchment canvas.
