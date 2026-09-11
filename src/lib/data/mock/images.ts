@@ -21,6 +21,12 @@
  * restriction that touches this use. Hotlinked rather than vendored so the repo
  * stays free of binary assets, which is also why `RemoteImage` owning the
  * fallback matters here.
+ *
+ * Note the two fallbacks are different things and only one survives. A frame
+ * that fails to LOAD is `RemoteImage`'s business and stays soft - a dead URL
+ * must not collapse a card. A frame that was never DEFINED is a fixture gap, and
+ * this module now throws on it rather than borrowing another craft's pool: see
+ * `unknownId` below.
  */
 
 /** Six to a craft, so a five-image gallery never repeats a frame. */
@@ -42,11 +48,29 @@ const byCategory = {
 } as const satisfies Record<string, readonly number[]>
 
 /**
- * A known-good frame, used when an id falls outside the fixtures. Named
- * separately so no lookup has to invent a photo id to satisfy the type.
+ * Both lookups below THROW on an unknown id rather than substituting a frame.
+ *
+ * They used to fall back to a known-good photo and to `byCategory.c1`, which
+ * meant any category outside c1-c6 silently showed handloom textiles: looms and
+ * dye yards under, say, Pattachitra. That is precisely the failure this file was
+ * built to prevent - the header's "waterfall on a cotton stole", reintroduced
+ * through the back door and harder to spot, because a plausible Indian craft
+ * photograph under the wrong craft does not look broken to anyone who does not
+ * already know the taxonomy.
+ *
+ * Unreachable while the fixtures cover exactly c1-c6, which is the point: the
+ * cost of a silent fallback is paid later, when the taxonomy grows and the new
+ * craft quietly wears the old one's photographs. Both call sites run at module
+ * scope (`products.ts` maps over its seeds, `artisans.ts` calls per literal), so
+ * a throw surfaces as an import-time failure with the offending id named - not
+ * as a crash mid-render.
  */
-const FALLBACK_PHOTO = 38556299
-const FALLBACK_POOL: readonly number[] = byCategory.c1
+const unknownId = (kind: string, id: string, known: readonly string[]): never => {
+  throw new Error(
+    `images.ts: no ${kind} fixture for '${id}'. Known: ${known.join(', ')}. ` +
+      `Add real photography for it rather than letting it borrow another craft's.`,
+  )
+}
 
 /** One portrait per artisan, matched to the craft they practise. */
 const portraits: Record<string, number> = {
@@ -71,9 +95,11 @@ const hash = (seed: string): number => {
   return Math.abs(h)
 }
 
-/** Artisan portrait, by artisan id. Falls back to the pool for unknown ids. */
-export const artisanPhoto = (artisanId: string): string =>
-  url(portraits[artisanId] ?? FALLBACK_PHOTO, 400)
+/** Artisan portrait, by artisan id. Throws on an unknown id: see `unknownId`. */
+export const artisanPhoto = (artisanId: string): string => {
+  const photo = portraits[artisanId] ?? unknownId('artisan', artisanId, Object.keys(portraits))
+  return url(photo, 400)
+}
 
 /**
  * PRD section 8 requires 3 to 5 gallery images per product. Each is a distinct
@@ -91,10 +117,16 @@ export const gallery = (seed: string, count: number, categoryId: string): string
   const pool: readonly number[] =
     categoryId in byCategory
       ? byCategory[categoryId as keyof typeof byCategory]
-      : FALLBACK_POOL
+      : unknownId('category', categoryId, Object.keys(byCategory))
   const start = hash(seed) % pool.length
-  return Array.from(
-    { length: Math.min(count, pool.length) },
-    (_, i) => url(pool[(start + i) % pool.length] ?? FALLBACK_PHOTO, 800),
-  )
+  return Array.from({ length: Math.min(count, pool.length) }, (_, i) => {
+    // In bounds by construction (the index is taken modulo the pool length);
+    // `noUncheckedIndexedAccess` still types it as possibly undefined. `??`
+    // onto a `never`-returning throw narrows without a cast, and keeps the
+    // no-substitution rule whole rather than reaching for a stand-in frame.
+    const photo =
+      pool[(start + i) % pool.length] ??
+      unknownId('category', categoryId, Object.keys(byCategory))
+    return url(photo, 800)
+  })
 }
