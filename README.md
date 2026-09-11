@@ -16,9 +16,23 @@ npm run lint     # oxlint
 
 Node 22.x (pinned in `engines` to match the Vercel build image).
 
+## Branches
+
+This repository holds two unrelated histories:
+
+- `main` (default) — this website. Vercel builds and deploys it.
+- `app` — the Android app, FastAPI backend and SQL, pushed from the separate
+  `KalaCartJava` working tree. It shares no commit ancestry with `main`.
+
+Vercel builds `main` only in production. Pushes to `app` produce a failing
+preview build, because that branch carries no `package.json`; the failure is
+expected and does not affect production.
+
 ## Deploy
 
-Vercel, linked via the CLI. `vercel --prod` from the project root.
+Vercel, via the GitHub App integration: a push to `main` triggers a production
+deployment automatically. `vercel --prod` from the project root still works for
+an out-of-band deploy.
 `vercel.json` rewrites paths to `/index.html` so client-side deep links such as
 `/browse` resolve instead of 404ing.
 
