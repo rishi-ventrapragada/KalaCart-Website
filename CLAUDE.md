@@ -14,8 +14,10 @@ Stage: active development / pre-launch.
 
 ## C · Stack
 - **Languages:** TypeScript (strict mode, no uninspected `any`)
-- **Frameworks:** React 18 · Vite · Tailwind CSS · React Router
-- **Libraries:** Lenis (smooth scroll) · Lucide React · react-i18next · GSAP (Home maker fan only, see §D). Admin charts are hand-rolled SVG, not Recharts (see §D).
+- **Frameworks:** React 19 · Vite · Tailwind CSS v4 · React Router
+- **Libraries:** Lenis (smooth scroll) · Lucide React · GSAP (Home only: the maker fan and the featured-grid reveal, see §D). Admin charts are hand-rolled SVG, not Recharts (see §D).
+- **i18n is a typed dictionary of our own, not react-i18next** — no i18next package is installed. `src/lib/i18n/en/` holds per-surface segments, `en.ts` assembles them, and `TranslationKey` is derived from that object, so `t('a.typo')` fails the build rather than rendering blank.
+- **Lenis is a site-wide singleton, mounted once in `AppShell` for every buyer route** (PRD 10.1) — it is the *scroll engine* (`useScrollEngine`, the hero spiral, the progress bar) that is Home-only. The admin desk is outside `AppShell` and mounts neither. Under `prefers-reduced-motion` no Lenis instance is created at all.
 - **Hosting / infra:** Vercel
 - **Key services:** Supabase (shared backend via data seam)
 - **Run locally:** `npm run dev`
@@ -75,7 +77,7 @@ What lives under `/memory`:
 - **The i18n seam:** No hardcoded user strings. Reference copy from `src/lib/i18n/`.
 - **Three states, always:** Every data view must handle loading (skeletons), empty, and error states with retry.
 - **Quality floor:** Responsive from 360px, visible focus rings, Esc-closable modals, reduced-motion respected.
-- **Motion discipline:** Single easing curve `cubic-bezier(.22, 1, .36, 1)`. One Lenis rAF loop on Home only. Anything the engine writes per frame carries `transition: none` **explicitly** — a zero duration is not enough, because `transition-property` defaults to `all` and one inherited duration silently reintroduces the lag. Shape binary: 999px capsule controls, 18–28px card radii.
+- **Motion discipline:** Single easing curve `cubic-bezier(.22, 1, .36, 1)`. One Lenis rAF loop for the whole buyer shell, and the scroll engine that reads it runs on Home only (see §C). Anything the engine writes per frame carries `transition: none` **explicitly** — a zero duration is not enough, because `transition-property` defaults to `all` and one inherited duration silently reintroduces the lag. Shape binary: 999px capsule controls, 18–28px card radii.
 - **Workflow & Git:** Plan before non-trivial building; inspect read-only first; verify in browser on both themes; stage explicit file paths only (never `git add .`); use heredoc commit messages.
 
 ## H · Memory Save Protocol

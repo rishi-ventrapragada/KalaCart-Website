@@ -21,6 +21,17 @@ interface ResultsGridProps {
 const SKELETON_COUNT = 8
 
 /**
+ * How many covers load eagerly rather than on scroll.
+ *
+ * Three, the `lg:grid-cols-3` first row - and unlike Home's featured grid this
+ * one genuinely IS the first thing in the viewport, since Browse opens on its
+ * results rather than on a hero. Those cards are the largest contentful paint
+ * on the route, so waiting for a layout pass to discover they are visible is a
+ * cost paid on the site's main discovery surface.
+ */
+const EAGER_COUNT = 3
+
+/**
  * The results (PRD 11.3): a count, a grid of ProductCards, and all three
  * states.
  *
@@ -110,6 +121,7 @@ export function ResultsGrid({
             <ProductCard
               product={product}
               category={categories.find((c) => c.id === product.categoryId)}
+              priority={i < EAGER_COUNT}
             />
           </Reveal>
         ))}

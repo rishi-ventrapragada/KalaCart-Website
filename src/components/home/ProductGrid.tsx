@@ -37,6 +37,21 @@ const COLUMNS_LG = 4
 const STAGGER = 0.08
 
 /**
+ * How many covers load eagerly rather than on scroll.
+ *
+ * COLUMNS_LG rather than COLUMNS_BASE, because this is the count that is
+ * above the fold in the WORST case: at 1280 the first row is four cards, and
+ * eager-loading four at 360 (where the first row is two) costs two extra
+ * requests for images the reader reaches in one short scroll. Erring the other
+ * way would leave two of the four desktop cards lazy and visibly late.
+ *
+ * The grid itself is below the hero on every width, so strictly none of these
+ * are in the first viewport on load. They are the first thing the reader
+ * scrolls to, and a lazy image cannot start loading until that scroll happens.
+ */
+const EAGER_COUNT = COLUMNS_LG
+
+/**
  * Featured products (PRD 11.2). The first surface carrying real photography,
  * so it sets the card pattern Browse reuses in Increment 9.
  */
@@ -102,6 +117,7 @@ export function ProductGrid() {
                 <ProductCard
                   product={product}
                   category={(categories.data ?? []).find((c) => c.id === product.categoryId)}
+                  priority={i < EAGER_COUNT}
                 />
               </div>
             ))}

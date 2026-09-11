@@ -28,7 +28,16 @@ import { auditRailFallback, auditReducedMotion } from './motion.mjs'
 
 const BASE = process.env.AUDIT_BASE ?? 'http://localhost:4173'
 
-/** Every route a reader can reach. `/admin/*` needs the mock flag set. */
+/**
+ * Every route a reader can reach.
+ *
+ * `/admin/*` needs the mock flag set, which is the default below. `/admin/login`
+ * is the one route that must be visited WITHOUT it: signed in, it redirects to
+ * the queue on mount, so auditing it with the flag would silently measure the
+ * queue a second time under a login label. That is not hypothetical - it is why
+ * this route went unaudited until Increment 19, and why its missing `main`
+ * landmark survived sixteen increments of a passing sweep.
+ */
 const ROUTES = [
   '/',
   '/browse',
@@ -36,10 +45,15 @@ const ROUTES = [
   '/product/p1',
   '/artisan/a1',
   '/no-such-page',
+  { path: '/admin/login', admin: false },
   '/admin/queue',
   '/admin/artisans',
   '/admin/analytics',
 ]
+
+/** Routes are either a bare path (signed in) or a path plus its flags. */
+const routeSpec = (route) =>
+  typeof route === 'string' ? { path: route, admin: true } : { admin: true, ...route }
 
 /* 360 is the floor PRD 14 names; 768 and 1024 straddle the `lg:` breakpoint,
    which is where a layout that passes at both extremes tends to break. */
@@ -73,12 +87,13 @@ async function checkFocusRings(page, label) {
 }
 
 async function auditRoute(browser, { route, width, theme, reducedMotion }) {
+  const { path, admin } = routeSpec(route)
   const context = await browser.newContext({
     viewport: { width, height: 900 },
     reducedMotion: reducedMotion ? 'reduce' : 'no-preference',
   })
   const page = await context.newPage()
-  const label = `[${String(width)} ${theme}${reducedMotion ? ' rm' : ''}] ${route}`
+  const label = `[${String(width)} ${theme}${reducedMotion ? ' rm' : ''}] ${path}`
 
   const consoleErrors = []
   page.on('console', (m) => {
@@ -89,14 +104,14 @@ async function auditRoute(browser, { route, width, theme, reducedMotion }) {
   })
 
   await page.addInitScript(
-    ([t]) => {
-      sessionStorage.setItem('kalacart-admin', 'true')
+    ([t, signedIn]) => {
+      if (signedIn) sessionStorage.setItem('kalacart-admin', 'true')
       sessionStorage.setItem('kalacart-theme', t)
     },
-    [theme],
+    [theme, admin],
   )
 
-  await page.goto(BASE + route, { waitUntil: 'networkidle' })
+  await page.goto(BASE + path, { waitUntil: 'networkidle' })
   // Mock latency is up to ~520ms; wait past it so views are settled, not loading.
   await page.waitForTimeout(1200)
 

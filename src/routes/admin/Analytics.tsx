@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 
+import { useDocumentTitle } from '@/app/useDocumentTitle'
 import { BarChartCard } from '@/components/admin/BarChartCard'
 import { LineChartCard } from '@/components/admin/LineChartCard'
 import { StatCardGrid } from '@/components/admin/StatCardGrid'
@@ -21,6 +22,8 @@ import { useT } from '@/lib/i18n'
  */
 export default function Analytics() {
   const t = useT()
+
+  useDocumentTitle(undefined, 'meta.adminAnalytics')
 
   /*
    * One read for both panels. The categories come along for the dye tones -

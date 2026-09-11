@@ -7,6 +7,7 @@ import { MockAuthNotice } from '@/components/admin/MockAuthNotice'
 import { BrandLockup } from '@/components/brand/BrandLockup'
 import { BackToTop } from '@/components/layout/BackToTop'
 import { Container } from '@/components/layout/Container'
+import { MAIN_CONTENT_ID, SkipLink } from '@/components/layout/SkipLink'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
 import { buttonBase, buttonSizes, buttonVariants } from '@/components/ui/buttonStyles'
 import { useToast } from '@/components/ui/useToast'
@@ -50,6 +51,9 @@ export default function AdminLayout() {
 
   return (
     <div className="flex min-h-dvh flex-col bg-canvas text-ink">
+      {/* The desk has its own header and three tabs to step past, so it wants
+          the same escape the buyer shell has. */}
+      <SkipLink />
       <header className="border-b border-line-strong bg-card">
         <Container>
           <div className="flex h-16 items-center gap-4">
@@ -87,7 +91,7 @@ export default function AdminLayout() {
         </Container>
       </header>
 
-      <main className="flex-1">
+      <main id={MAIN_CONTENT_ID} tabIndex={-1} className="flex-1">
         <Container className="flex flex-col gap-6 py-8">
           {/*
             Carried on every admin page, not just the login screen. Someone who

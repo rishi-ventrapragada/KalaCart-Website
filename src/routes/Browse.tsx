@@ -1,6 +1,7 @@
 import { SlidersHorizontal } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 
+import { useDocumentTitle } from '@/app/useDocumentTitle'
 import { ActiveFilters } from '@/components/browse/ActiveFilters'
 import { FilterDrawer } from '@/components/browse/FilterDrawer'
 import { FilterPanel } from '@/components/browse/FilterPanel'
@@ -41,6 +42,8 @@ export default function Browse() {
   const state = useProductFilters()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const t = useT()
+
+  useDocumentTitle(undefined, 'meta.browse')
 
   const facets = useAsyncData(fetchFacets)
 

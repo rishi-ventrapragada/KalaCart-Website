@@ -3,9 +3,11 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 
 import { ADMIN_HOME_PATH } from '@/app/adminAuth'
 import { useAdmin } from '@/app/useAdmin'
+import { useDocumentTitle } from '@/app/useDocumentTitle'
 import { MockAuthNotice } from '@/components/admin/MockAuthNotice'
 import { BrandLockup } from '@/components/brand/BrandLockup'
 import { Container } from '@/components/layout/Container'
+import { MAIN_CONTENT_ID, SkipLink } from '@/components/layout/SkipLink'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useT } from '@/lib/i18n'
@@ -30,6 +32,9 @@ export default function AdminLogin() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<LoginErrors>({})
+
+  // Above the `isAdmin` redirect below: hooks cannot be called conditionally.
+  useDocumentTitle(undefined, 'meta.adminLogin')
 
   // Where the guard was trying to send them before the detour.
   const from = (location.state as FromState | null)?.from
@@ -63,72 +68,89 @@ export default function AdminLogin() {
   }
 
   return (
-    <Container className="flex justify-center py-16 sm:py-24">
-      <div className="flex w-full max-w-md flex-col gap-6">
-        <div className="flex flex-col gap-2">
-          {/*
-            This screen sits outside both shells (App.tsx), so it is the one
-            surface with no chrome to carry the brand - a bare sign-in form on
-            an unidentified page. The lockup links home so the doorway is not a
-            dead end for someone who arrived here by mistake.
-          */}
-          <Link to="/" aria-label={t('brand.home')} className="mb-2 self-start text-ink">
-            <BrandLockup />
-          </Link>
-          <h1 className="text-3xl">{t('admin.auth.title')}</h1>
-          <p className="text-sm text-muted">{t('admin.auth.intro')}</p>
-        </div>
+    /*
+     * This screen sits outside both shells (App.tsx), so unlike every other
+     * route it has no frame supplying the landmark and the skip link - it was
+     * the one page on the site with no `main` at all, which left a screen
+     * reader nothing to jump to. It carries both itself.
+     */
+    <>
+      {/*
+        Carried here too, though this page has only the lockup ahead of the
+        form. Not for the two stops it saves, but because this route supplies
+        its own `main` and would otherwise be the one page on the site where
+        the skip target exists with nothing able to reach it.
+      */}
+      <SkipLink />
+      <main id={MAIN_CONTENT_ID} tabIndex={-1}>
+        <Container className="flex justify-center py-16 sm:py-24">
+          <div className="flex w-full max-w-md flex-col gap-6">
+            <div className="flex flex-col gap-2">
+              {/*
+                This screen sits outside both shells (App.tsx), so it is the one
+                surface with no chrome to carry the brand - a bare sign-in form on
+                an unidentified page. The lockup links home so the doorway is not a
+                dead end for someone who arrived here by mistake.
+              */}
+              <Link to="/" aria-label={t('brand.home')} className="mb-2 self-start text-ink">
+                <BrandLockup />
+              </Link>
+              <h1 className="text-3xl">{t('admin.auth.title')}</h1>
+              <p className="text-sm text-muted">{t('admin.auth.intro')}</p>
+            </div>
 
-        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
-          <Input
-            label={t('admin.auth.email')}
-            type="email"
-            name="email"
-            autoComplete="username"
-            value={email}
-            error={errors.email ?? ''}
-            onChange={(e) => {
-              setEmail(e.target.value)
-              setErrors({})
-            }}
-          />
+            <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+              <Input
+                label={t('admin.auth.email')}
+                type="email"
+                name="email"
+                autoComplete="username"
+                value={email}
+                error={errors.email ?? ''}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  setErrors({})
+                }}
+              />
 
-          <Input
-            label={t('admin.auth.password')}
-            type="password"
-            name="password"
-            autoComplete="current-password"
-            value={password}
-            error={errors.password ?? ''}
-            onChange={(e) => {
-              setPassword(e.target.value)
-              setErrors({})
-            }}
-          />
+              <Input
+                label={t('admin.auth.password')}
+                type="password"
+                name="password"
+                autoComplete="current-password"
+                value={password}
+                error={errors.password ?? ''}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  setErrors({})
+                }}
+              />
 
-          {/*
-            The credential failure belongs to the pair, so it sits below both
-            fields rather than on either one. `alert` announces it without
-            moving focus away from where the reader is typing.
-          */}
-          {errors.credential ? (
-            <p role="alert" className="text-2xs text-ink">
-              {errors.credential}
-            </p>
-          ) : null}
+              {/*
+                The credential failure belongs to the pair, so it sits below both
+                fields rather than on either one. `alert` announces it without
+                moving focus away from where the reader is typing.
+              */}
+              {errors.credential ? (
+                <p role="alert" className="text-2xs text-ink">
+                  {errors.credential}
+                </p>
+              ) : null}
 
-          <Button type="submit" size="lg" className="w-full">
-            {t('admin.auth.signIn')}
-          </Button>
-        </form>
+              <Button type="submit" size="lg" className="w-full">
+                {t('admin.auth.signIn')}
+              </Button>
+            </form>
 
-        {/* The disclosure, directly under the form it describes (PRD 11.1). */}
-        <MockAuthNotice />
+            {/* The disclosure, directly under the form it describes (PRD 11.1). */}
+            <MockAuthNotice />
 
-        <Link to="/" className="text-2xs text-muted transition-colors hover:text-ink">
-          {t('admin.nav.backToSite')}
-        </Link>
-      </div>
-    </Container>
+            <Link to="/" className="text-2xs text-muted transition-colors hover:text-ink">
+              {t('admin.nav.backToSite')}
+            </Link>
+          </div>
+        </Container>
+      </main>
+    </>
   )
 }

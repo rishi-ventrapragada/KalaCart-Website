@@ -23,17 +23,34 @@
       content="Buy handmade goods straight from Indian artisans. No middlemen, no commission, and the full story of every craft."
     />
     <!--
-      Theme colour for mobile browser chrome, one per theme so the address bar
-      matches the canvas the page is actually painting. Values are the literal
-      --canvas of each palette (src/app/theme.ts); the meta tag is read before
-      any stylesheet resolves, so a var() here would not work.
+      Theme colour for mobile browser chrome. ONE value, not one per
+      prefers-color-scheme, because this app does not follow the OS preference:
+      PRD 9.1 sets the default theme to light, ThemeProvider reads only its
+      stored session value, and the pre-paint script below applies light unless
+      a previous choice in this tab says otherwise.
+
+      The earlier pair keyed on prefers-color-scheme contradicted that. A reader
+      whose OS is dark and who had made no choice got a #121212 address bar
+      above a parchment page - the one combination neither theme ever paints.
+
+      The value is the literal --canvas of the light palette (src/app/theme.ts);
+      the tag is read before any stylesheet resolves, so a var() would not work.
+      A reader who switches to dark keeps a light chrome bar until reload, which
+      is the lesser of the two mismatches and the honest default for a page that
+      loads light. Making it track the toggle means writing this tag from
+      ThemeProvider, which is a change worth making only if it is asked for.
     -->
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F6E9DF" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121212" />
+    <meta name="theme-color" content="#F6E9DF" />
     <!--
-      Link unfurls. Relative image paths are resolved against the page URL by
-      most scrapers but not all - if previews come back blank once there is a
-      production domain, these two want absolute URLs.
+      Link unfurls. %ORIGIN% is substituted at build time by the plugin in
+      vite.config.ts: the deployment's own production origin on Vercel, and an
+      empty string locally (leaving the relative path that localhost wants).
+
+      og:image has to be absolute in production. Most scrapers resolve a
+      relative path against the page URL, but several do not - WhatsApp among
+      them, which is the channel this project's own buyers and artisans use to
+      share a listing - and they show no preview at all rather than a broken
+      one.
     -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="KalaCart" />
@@ -41,7 +58,8 @@
       property="og:description"
       content="Buy handmade goods straight from Indian artisans. No middlemen, no commission, and the full story of every craft."
     />
-    <meta property="og:image" content="/og-image.svg" />
+    <meta property="og:image" content="%ORIGIN%/og-image.svg" />
+    <meta property="og:url" content="%ORIGIN%/" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
+import { useDocumentTitle } from '@/app/useDocumentTitle'
 import { ArtisanMiniCard } from '@/components/product/ArtisanMiniCard'
 import { ImageGallery } from '@/components/product/ImageGallery'
 import { InquiryModal } from '@/components/product/InquiryModal'
@@ -65,6 +66,15 @@ export default function ProductDetail() {
   }, [id])
 
   const page = useAsyncData(fetchPage)
+
+  /*
+   * Above every early return below, because hooks cannot be called
+   * conditionally. It takes the product title once the read lands and undefined
+   * before that, so the tab shows the generic craft name while loading and the
+   * real piece afterwards - and keeps the generic one if the id is not a
+   * product, which is the not-found case further down.
+   */
+  useDocumentTitle(page.data?.product?.title, 'meta.product')
 
   if (page.state === 'error') {
     return (

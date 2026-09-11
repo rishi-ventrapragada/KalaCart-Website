@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
+import { useDocumentTitle } from '@/app/useDocumentTitle'
 import { ArtisanQueue } from '@/components/admin/ArtisanQueue'
 import { ProductQueue } from '@/components/admin/ProductQueue'
 import { QueueTabs, type QueueTab } from '@/components/admin/QueueTabs'
@@ -28,6 +29,8 @@ export default function VerificationQueue() {
   const [params, setParams] = useSearchParams()
   const { showToast } = useToast()
   const t = useT()
+
+  useDocumentTitle(undefined, 'meta.adminQueue')
 
   // The tab lives in the URL, like Browse's filters: a reviewer can send a
   // colleague straight to the products awaiting review, and Back works.

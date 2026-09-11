@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 
+import { useDocumentTitle } from '@/app/useDocumentTitle'
 import { ArtisanFilterBar } from '@/components/admin/ArtisanFilterBar'
 import { ArtisanTable } from '@/components/admin/ArtisanTable'
 import { ArtisanTableRow } from '@/components/admin/ArtisanTableRow'
@@ -34,6 +35,8 @@ export default function ArtisanManagement() {
   const { showToast } = useToast()
   const t = useT()
   const [confirming, setConfirming] = useState<PendingConfirm | null>(null)
+
+  useDocumentTitle(undefined, 'meta.adminArtisans')
 
   /*
    * The filters go to the seam rather than being applied here, so the mock and

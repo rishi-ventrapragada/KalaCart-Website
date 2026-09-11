@@ -5,6 +5,7 @@ import { catalog } from '@/lib/i18n/en/catalog'
 import { chrome } from '@/lib/i18n/en/chrome'
 import { core } from '@/lib/i18n/en/core'
 import { home } from '@/lib/i18n/en/home'
+import { meta } from '@/lib/i18n/en/meta'
 import { system } from '@/lib/i18n/en/system'
 
 /**
@@ -30,6 +31,7 @@ import { system } from '@/lib/i18n/en/system'
 export const en = {
   ...core,
   ...chrome,
+  ...meta,
   ...home,
   ...browse,
   ...artisans,

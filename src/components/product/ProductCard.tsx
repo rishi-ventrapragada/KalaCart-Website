@@ -17,6 +17,15 @@ interface ProductCardProps {
   product: Product
   /** Undefined while categories are still loading, or if one is missing. */
   category?: Category | undefined
+  /**
+   * Load the cover immediately instead of lazily. For the first row of a grid
+   * that sits above the fold, and nothing else - see `RemoteImage`.
+   *
+   * It is the caller's call rather than the card's because only the caller
+   * knows where in a grid a card landed, and the same card renders in Home's
+   * featured row, Browse's results and two detail pages.
+   */
+  priority?: boolean
 }
 
 /**
@@ -29,7 +38,7 @@ interface ProductCardProps {
  * the generic-craft-page tells CLAUDE.md names, and a grid where every card
  * grows a shadow reads as a template.
  */
-export function ProductCard({ product, category }: ProductCardProps) {
+export function ProductCard({ product, category, priority = false }: ProductCardProps) {
   return (
     <Link
       to={`/product/${product.id}`}
@@ -46,6 +55,7 @@ export function ProductCard({ product, category }: ProductCardProps) {
       <RemoteImage
         src={product.imageUrls[0] ?? ''}
         alt=""
+        priority={priority}
         wrapperClassName="aspect-square w-full"
       />
 

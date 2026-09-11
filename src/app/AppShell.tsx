@@ -6,6 +6,7 @@ import { useScrollReset } from '@/app/useScrollReset'
 import { BackToTop } from '@/components/layout/BackToTop'
 import { Footer } from '@/components/layout/Footer'
 import { Navbar } from '@/components/layout/Navbar'
+import { MAIN_CONTENT_ID, SkipLink } from '@/components/layout/SkipLink'
 
 /**
  * The persistent frame around every BUYER route.
@@ -28,8 +29,13 @@ export default function AppShell() {
   return (
     <MotionProvider>
       <div className="flex min-h-dvh flex-col bg-canvas text-ink">
+        {/* First in the DOM, so it is the first thing Tab reaches on every
+            buyer route - ahead of the brand lockup and the whole navbar. */}
+        <SkipLink />
         <Navbar />
-        <main className="flex-1">
+        {/* tabIndex -1 so the skip link can move focus here without putting
+            the container itself into the tab order. */}
+        <main id={MAIN_CONTENT_ID} tabIndex={-1} className="flex-1">
           <Outlet />
         </main>
         {/* Between the content and the footer, so it is the last thing before

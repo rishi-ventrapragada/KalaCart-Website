@@ -1,3 +1,4 @@
+import { useHomeDocumentTitle } from '@/app/useDocumentTitle'
 import { ArtisanRow } from '@/components/home/ArtisanRow'
 import { ClosingCta } from '@/components/home/ClosingCta'
 import { HeroSection } from '@/components/home/HeroSection'
@@ -18,6 +19,8 @@ import { RailSection } from '@/components/home/RailSection'
  * it scale, and the close asks for the one action.
  */
 export default function Home() {
+  useHomeDocumentTitle()
+
   return (
     <>
       <HeroSection />

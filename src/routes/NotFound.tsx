@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 
+import { useDocumentTitle } from '@/app/useDocumentTitle'
 import { Container } from '@/components/layout/Container'
 import { buttonBase, buttonSizes, buttonVariants } from '@/components/ui/buttonStyles'
 import { useT } from '@/lib/i18n'
@@ -23,6 +24,8 @@ import { cn } from '@/lib/utils/cn'
  */
 export default function NotFound() {
   const t = useT()
+
+  useDocumentTitle(undefined, 'meta.notFound')
 
   return (
     <Container className="flex flex-col items-center gap-5 py-24 text-center sm:py-32">

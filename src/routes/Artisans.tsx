@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 
+import { useDocumentTitle } from '@/app/useDocumentTitle'
 import { ArtisanFilterBar } from '@/components/artisan/ArtisanFilterBar'
 import { ArtisanGrid } from '@/components/artisan/ArtisanGrid'
 import { Container } from '@/components/layout/Container'
@@ -38,6 +39,8 @@ const fetchFacets = async () => {
 export default function Artisans() {
   const state = useArtisanFilters()
   const t = useT()
+
+  useDocumentTitle(undefined, 'meta.artisans')
 
   const facets = useAsyncData(fetchFacets)
 

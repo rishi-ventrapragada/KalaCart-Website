@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
+import { useDocumentTitle } from '@/app/useDocumentTitle'
 import { ArtisanHeader } from '@/components/artisan/ArtisanHeader'
 import { ArtisanProfileSkeleton } from '@/components/artisan/ArtisanProfileSkeleton'
 import { Container } from '@/components/layout/Container'
@@ -46,6 +47,11 @@ export default function ArtisanProfile() {
   }, [id])
 
   const page = useAsyncData(fetchPage)
+
+  // Above the early returns below: hooks cannot be called conditionally. The
+  // maker's name once the read lands, the generic title before that and if the
+  // id is not an approved artisan.
+  useDocumentTitle(page.data?.artisan?.name, 'meta.artisan')
 
   if (page.state === 'error') {
     return (

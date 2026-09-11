@@ -9,6 +9,20 @@ interface RemoteImageProps {
   className?: string
   /** Applied to the wrapper, which owns the aspect ratio and the fallback. */
   wrapperClassName?: string
+  /**
+   * Load this image immediately rather than when it scrolls into view.
+   *
+   * Set it ONLY for imagery that is above the fold on first paint. Lazy loading
+   * is the right default for a catalogue - most of Browse's 26 cards are far
+   * below the viewport - but applying it to what is already on screen is a
+   * measured cost, not a saving: the browser must lay the page out before it
+   * can tell a lazy image is visible, so the request starts late and the
+   * largest element on the page paints later than it needs to.
+   *
+   * `fetchPriority="high"` rides along with it, which is the half that actually
+   * reorders the request against the stylesheet and font loads ahead of it.
+   */
+  priority?: boolean
 }
 
 /**
@@ -26,7 +40,13 @@ interface RemoteImageProps {
  * The placeholder is also what shows while the image is in flight, which means
  * no layout shift when it arrives.
  */
-export function RemoteImage({ src, alt, className, wrapperClassName }: RemoteImageProps) {
+export function RemoteImage({
+  src,
+  alt,
+  className,
+  wrapperClassName,
+  priority = false,
+}: RemoteImageProps) {
   const [failed, setFailed] = useState(false)
 
   return (
@@ -35,7 +55,10 @@ export function RemoteImage({ src, alt, className, wrapperClassName }: RemoteIma
         <img
           src={src}
           alt={alt}
-          loading="lazy"
+          loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : 'auto'}
+          // `async` even when priority: this decodes off the main thread either
+          // way, and `sync` would block paint on a large hero frame.
           decoding="async"
           onError={() => {
             setFailed(true)

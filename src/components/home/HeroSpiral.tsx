@@ -131,6 +131,13 @@ export function HeroSpiral() {
           <RemoteImage
             src={product.imageUrls[0] ?? ''}
             alt=""
+            /*
+             * Every card here is above the fold - the spiral sits beside the
+             * headline in the first viewport - and they are small (104px
+             * square), so eager-loading the set costs little and stops the
+             * hero assembling itself piecemeal as the reader watches.
+             */
+            priority
             wrapperClassName="size-full rounded-[inherit]"
           />
         </div>
