@@ -19,8 +19,20 @@ Node 22.x (pinned in `engines` to match the Vercel build image).
 ## Deploy
 
 Vercel, linked via the CLI. `vercel --prod` from the project root.
-`vercel.json` rewrites all paths to `/index.html` so client-side deep links
-such as `/browse` resolve instead of 404ing.
+`vercel.json` rewrites paths to `/index.html` so client-side deep links such as
+`/browse` resolve instead of 404ing.
+
+The rewrite excludes the root-level static assets (`favicon.ico`,
+`favicon.svg`, `apple-touch-icon.svg`, `og-image.svg`, `assets/`) through a
+negative lookahead. It used to match `/(.*)` with no exclusions, which meant a
+request for an asset that did not exist was answered with the app shell instead
+of a 404 — and since browsers request `/favicon.ico` by convention whether or
+not it is declared, the browser received an HTML page where it expected an icon
+and kept displaying whichever favicon it had cached previously. Assets must
+404 when missing; only routes fall through.
+
+Note the `$` anchors in the pattern: only exact root-level paths are excluded,
+so `/deep/favicon.ico` still resolves as an SPA route.
 
 ## Decisions that diverge from PRD.md
 

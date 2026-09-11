@@ -2,7 +2,19 @@
 <html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
+    <!--
+      Two icons, in this order deliberately. Browsers that understand SVG take
+      the first and scale it cleanly; the .ico is the fallback for those that do
+      not, and it also answers the bare /favicon.ico that browsers request by
+      convention whether or not it is declared here.
+
+      That convention request is why the .ico has to exist at all: the SPA
+      rewrite in vercel.json sends anything unmatched to index.html, so without
+      a real file the browser got an HTML page where it expected an icon, and
+      fell back to whatever it had cached before.
+    -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" sizes="any" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KalaCart</title>
