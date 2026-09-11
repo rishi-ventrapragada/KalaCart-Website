@@ -3,6 +3,14 @@
  * every load, without checking any assets into the repo. Replaced by real
  * Supabase Storage URLs when the backend is wired (PRD section 16, question 4).
  *
+ * Photographs are ASSIGNED, not hashed. Each product reserves a hero frame no
+ * other product uses, and fills the rest of its gallery from what is left of
+ * its craft's pool; see `gallery`. The earlier scheme hashed the product id
+ * into a shared pool, which reserved nothing and left six photographs heading
+ * more than one card - visible side by side in the Browse grid, which is the
+ * one place heroes are compared directly. Pottery is the single craft where the
+ * guarantee cannot hold: see the note on `byCategory.c2`.
+ *
  * The photographs are real craft photography from Pexels, drawn per category so
  * a Blue Pottery listing only ever shows pottery. The seeded-random source it
  * replaced returned any photograph at all, which put a waterfall on a cotton
@@ -30,7 +38,12 @@
  */
 
 /**
- * Six to a craft, so a five-image gallery never repeats a frame.
+ * A craft's pool must be at least as long as its product count, or a hero
+ * repeats: `gallery` hands the nth product of a craft the nth frame here, so
+ * pool length is the hero budget, not merely the gallery depth. Six is the
+ * working minimum (a five-image gallery never repeats within one strip);
+ * Handloom carries twelve because it absorbed c5, Pottery three because only
+ * three frames survived verification.
  *
  * Keyed by category id, and the ids here are the ones in `categories.ts`. Three
  * crafts in that taxonomy (c8 Jewellery, c9 Leather, c10 Stone
@@ -52,11 +65,16 @@ const byCategory = {
     38556299, 32673642, 14953193, 31508152, 34395785, 4253609,
     7037689, 57565, 4566670, 28389703, 15020640, 39180709,
   ],
-  // Pottery — Jaipur cobalt-on-white work. Short by design: see the note above
-  // `gallery`. Everything else the search offered was terracotta, Turkish, or
-  // unplaceable, and a wrong frame costs more than a repeated one. Widening
-  // this pool is worthwhile now the craft is no longer specifically *Blue*
-  // Pottery, but only with frames checked the same way.
+  // Pottery — Jaipur cobalt-on-white work. Short by design, and the ONE craft
+  // where the hero reservation in `gallery` cannot hold: five products against
+  // three photographs, so p5/p8 and p6/p29 share a lead. Known gap, not an
+  // oversight. Widening was attempted again and failed: fifteen candidates
+  // inspected by eye across eight query formulations, every one of them
+  // terracotta, Turkish Iznik (the tulip-and-arabesque vase stalls that
+  // dominate a cobalt search), Jaipur ARCHITECTURE, Latin American polychrome,
+  // or matched on nothing but the word blue. A wrong frame still costs more
+  // than a repeated one, so the repeat stays until frames checked the same way
+  // turn up.
   c2: [33575396, 33575397, 34022881],
   // Paintings — Mithila panels and Indian folk-art stalls.
   c3: [34961656, 165891, 22820070, 10653309, 36817155, 22820072],
@@ -112,15 +130,31 @@ const url = (id: number, size: number): string =>
   `?auto=compress&cs=tinysrgb&w=${size}&h=${size}&fit=crop`
 
 /**
- * A stable index into a craft's pool. Products are numbered p1, p2, p3... in
- * source order, so hashing the whole id rather than a trailing number keeps
- * neighbouring listings from marching through the pool in lockstep and showing
- * the grid the same photograph down a column.
+ * Which products claim a hero, and in what order, per craft.
+ *
+ * `products.ts` is the only caller and maps its seeds in source order, so the
+ * nth product of a craft takes the nth photo of that craft's pool as its hero.
+ * Deriving that rank here - rather than passing it in - keeps `gallery`'s
+ * signature and leaves the seam swappable for Supabase Storage URLs.
+ *
+ * The register is module-scope and filled lazily on first ask per craft, which
+ * is safe because it is keyed on the seed, not on call order: asking twice for
+ * the same product returns the same rank, so the gallery is identical on every
+ * load and under any import order.
  */
-const hash = (seed: string): number => {
-  let h = 0
-  for (let i = 0; i < seed.length; i += 1) h = (h * 31 + seed.charCodeAt(i)) | 0
-  return Math.abs(h)
+const heroRank = new Map<string, Map<string, number>>()
+
+const rankOf = (seed: string, categoryId: string): number => {
+  let seen = heroRank.get(categoryId)
+  if (!seen) {
+    seen = new Map()
+    heroRank.set(categoryId, seen)
+  }
+  const already = seen.get(seed)
+  if (already !== undefined) return already
+  const rank = seen.size
+  seen.set(seed, rank)
+  return rank
 }
 
 /** Artisan portrait, by artisan id. Throws on an unknown id: see `unknownId`. */
@@ -130,23 +164,34 @@ export const artisanPhoto = (artisanId: string): string => {
 }
 
 /**
- * PRD section 8 requires 3 to 5 gallery images per product. Each is a distinct
- * frame from the product's own craft: offsetting by the seed hash and stepping
- * through the pool keeps neighbouring listings from opening on the same photo.
+ * PRD section 8 requires 3 to 5 gallery images per product.
  *
- * A gallery is capped at the size of its craft's pool, so it never shows the
- * same frame twice. Blue Pottery has only three verified Jaipur images, so its
- * five-image listings show three. That is the deliberate trade: a short gallery
- * reads as a small catalogue, while a padded one reads as a fake catalogue, and
- * a repeated frame in a five-thumbnail strip is the more obvious tell of the
- * two. Widening the pool is a matter of finding three more correct photographs.
+ * Every product LEADS with a photo no other product uses. Deeper frames are
+ * shared within a craft deliberately: they are reached only by opening a single
+ * detail page, where nothing sits beside them to compare against. Fully
+ * disjoint galleries are NOT the goal and are unreachable - 131 frame slots
+ * over 39 photographs - and closing that gap would mean padding, inventing, or
+ * borrowing across crafts.
+ *
+ * The nth product of a craft takes `pool[n]` as its hero, then fills the rest
+ * by stepping through the remaining frames from there. Three of the hash's six
+ * collisions were in Handloom, whose pool is not even short (twelve frames,
+ * twelve products), so they were the hash's own doing rather than a shortage.
+ *
+ * A gallery is capped at its pool size, so it never repeats a frame within one
+ * strip - a short gallery reads as a small catalogue, a padded one as a fake
+ * catalogue, and a repeat inside a five-thumbnail strip is the more obvious
+ * tell. Pottery is the one craft where the hero guarantee does not hold: five
+ * products against three verified Jaipur photographs, so three lead uniquely
+ * and two repeat. Widening it is a matter of finding correct photographs; see
+ * the note on `byCategory.c2`.
  */
 export const gallery = (seed: string, count: number, categoryId: string): string[] => {
   const pool: readonly number[] =
     categoryId in byCategory
       ? byCategory[categoryId as keyof typeof byCategory]
       : unknownId('category', categoryId, Object.keys(byCategory))
-  const start = hash(seed) % pool.length
+  const start = rankOf(seed, categoryId) % pool.length
   return Array.from({ length: Math.min(count, pool.length) }, (_, i) => {
     // In bounds by construction (the index is taken modulo the pool length);
     // `noUncheckedIndexedAccess` still types it as possibly undefined. `??`
