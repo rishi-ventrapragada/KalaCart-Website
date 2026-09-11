@@ -9,10 +9,18 @@ import type { Product } from '@/lib/data'
  *
  * - Pottery (c2), Paintings (c3) and Metal Art (c4) are shot close, one object
  *   filling the frame. They stay legible all the way down.
- * - Handloom (c1) and Bamboo (c6) are shot wide - an artisan at a loom, a
- *   printer over a table, a vendor in a stall. The craft is somewhere in a busy
- *   scene, and below about 110px it dissolves into an indistinct
+ * - Handloom (c1), Bamboo (c6) and Wood Craft (c7) are shot wide - an artisan at
+ *   a loom, a printer over a table, a vendor in a stall. The craft is somewhere
+ *   in a busy scene, and below about 110px it dissolves into an indistinct
  *   brown-and-cream texture. Block printing at 88px is a blue rectangle.
+ *
+ * Wood Craft was classified when its frames landed, not assumed: checked at
+ * 100px, five of its six are a carver bent over a panel or a statue, and the
+ * carving itself is the same timber colour as the workshop floor, the shavings
+ * and the maker's hands - so the whole frame goes to one brown. The sixth, a
+ * wall of lacquered Karnataka figures, is the inverse failure: it is a hundred
+ * small objects rather than one, and at render size it reads as an abstract
+ * colour grid. Both belong behind the object-forward crops.
  *
  * The taxonomy rename does not disturb this. The ids kept their photo pools, so
  * the finding is about the same frames it was always about - and the block
@@ -23,7 +31,7 @@ import type { Product } from '@/lib/data'
  * sharp, and lets the scene frames sit toward the back where the edge blur is
  * already abstracting them into colour and depth. Nothing is excluded: every
  * craft with listings appears, which matters for a platform whose pitch is the
- * breadth of what it carries. The four crafts still awaiting fixtures never
+ * breadth of what it carries. The three crafts still awaiting fixtures never
  * reach here - this reads products, not categories - and each will need
  * classifying by eye when its frames land.
  *

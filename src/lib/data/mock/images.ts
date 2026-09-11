@@ -32,8 +32,8 @@
 /**
  * Six to a craft, so a five-image gallery never repeats a frame.
  *
- * Keyed by category id, and the ids here are the ones in `categories.ts`. Four
- * crafts in that taxonomy (c7 Wood Craft, c8 Jewellery, c9 Leather, c10 Stone
+ * Keyed by category id, and the ids here are the ones in `categories.ts`. Three
+ * crafts in that taxonomy (c8 Jewellery, c9 Leather, c10 Stone
  * Art) deliberately have NO pool yet: they came from the real Supabase table
  * and their fixtures land one craft at a time, each with its own set of frames
  * verified by eye. Their absence is safe because this module is reached through
@@ -64,6 +64,13 @@ const byCategory = {
   c4: [39032263, 34504204, 12573352, 33311200, 26792961, 33311188],
   // Bamboo — Indian basket makers and their stock.
   c6: [18358177, 12940501, 34878662, 14224817, 35264910, 14367748],
+  // Wood Craft — Saharanpur carvers at pierced floral panels, a chisel close-up,
+  // deity carving in Kumbakonam and Bhubaneswar, and a wall of Karnataka
+  // lacquered figures. Every frame is placeable in a named wood-craft centre,
+  // which is how the Channapatna candidates were sorted: painted nesting dolls
+  // read Indian by eye but carry no provenance and sit beside matryoshka in the
+  // stock tagging, so they were rejected rather than guessed at.
+  c7: [37011185, 32646621, 19127914, 26792923, 37870822, 34913184],
 } as const satisfies Record<string, readonly number[]>
 
 /**
@@ -96,7 +103,8 @@ const unknownId = (kind: string, id: string, known: readonly string[]): never =>
 const portraits: Record<string, number> = {
   a1: 14953193, a2: 33575396, a3: 22820070,
   a4: 26792961, a5: 7037689, a6: 34878662,
-  a7: 32673642, a8: 22820072, a9: 12940501,
+  a7: 32673642, a8: 22820072, a9: 26792923,
+  a10: 37011185,
 }
 
 const url = (id: number, size: number): string =>

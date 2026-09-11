@@ -2,7 +2,7 @@ import type { Product } from '@/lib/data/types'
 import { gallery } from '@/lib/data/mock/images'
 
 /**
- * Thirty products. Prices run from 450 to 18,000 rupees and createdAt spans
+ * Thirty-three products. Prices run from 450 to 18,000 rupees and createdAt spans
  * about a year, so the Browse price filter and the 'newest' sort both have
  * real range to work with, and the signups-over-time chart is not flat.
  *
@@ -140,6 +140,18 @@ const productSeeds: ProductSeed[] = [
     title: 'Kutchi wool floor rug',
     description:
       'A flat-weave rug in undyed black and white wool, woven in two panels and joined down the centre.' },
+  { id: 'p31', artisanId: 'a10', categoryId: 'c7', priceInr: 9400, images: 5, status: 'approved', createdAt: '2024-10-28T10:00:00.000Z',
+    title: 'Sheesham jali panel, carved',
+    description:
+      'A pierced floral lattice cut by hand from a single sheesham board, worked from both faces so the pattern reads either way.' },
+  { id: 'p32', artisanId: 'a10', categoryId: 'c7', priceInr: 2850, images: 4, status: 'approved', createdAt: '2025-03-14T10:00:00.000Z',
+    title: 'Carved mango wood bowl',
+    description:
+      'Turned from a single block of mango wood and finished with a shallow vine border cut around the rim.' },
+  { id: 'p33', artisanId: 'a10', categoryId: 'c7', priceInr: 6300, images: 4, status: 'approved', createdAt: '2025-06-21T10:00:00.000Z',
+    title: 'Sheesham document box, brass inlaid',
+    description:
+      'A hinged box in sheesham with brass wire set into the lid, sized for papers rather than jewellery.' },
 ]
 
 export const products: Product[] = productSeeds.map(({ images, ...rest }) => ({
