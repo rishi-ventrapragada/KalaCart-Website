@@ -40,3 +40,4 @@ lab
 # Agent skill bundles. Third-party tooling, not KalaCart source.
 .agents/
 .claude/
+.codex/
