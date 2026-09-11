@@ -69,6 +69,9 @@ export const home = {
       title: 'Find the maker behind the craft.',
       body: 'Every listing links you straight to the artisan who made it.',
       cta: 'Browse crafts',
+      /* The second way in. The close offers both of the site's entry points -
+         by craft, or by the person - rather than only the catalogue. */
+      ctaArtisans: 'Meet the artisans',
     },
     progressLabel: 'Reading progress',
   },

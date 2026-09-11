@@ -35,10 +35,30 @@ export function ClosingCta() {
             <p className="text-base leading-relaxed text-muted">{t('home.closing.body')}</p>
           </Reveal>
 
-          <Reveal delay={160} className="pt-1">
-            <Link to="/browse" className={cn(buttonBase, buttonVariants.primary, buttonSizes.lg)}>
-              {t('home.closing.cta')}
-            </Link>
+          {/*
+            Both entry points, side by side: by craft, or by the person who
+            made it. They are not peers in weight - Browse keeps the filled
+            capsule and Artisans takes the outline, because two solid accent
+            fills next to each other would leave a reader with no primary
+            action and put twice the accent area on a surface PRD 9.6 already
+            rates as a large one.
+
+            They stack below `sm`. A 360px line cannot hold two `lg` capsules
+            without one wrapping its label mid-word, and `w-full` on the stack
+            keeps them the same width rather than ragged.
+          */}
+          <Reveal delay={160} className="w-full pt-1">
+            <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
+              <Link to="/browse" className={cn(buttonBase, buttonVariants.primary, buttonSizes.lg)}>
+                {t('home.closing.cta')}
+              </Link>
+              <Link
+                to="/artisans"
+                className={cn(buttonBase, buttonVariants.secondary, buttonSizes.lg)}
+              >
+                {t('home.closing.ctaArtisans')}
+              </Link>
+            </div>
           </Reveal>
         </div>
       </Container>
