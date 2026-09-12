@@ -6,14 +6,12 @@ import { ArtisanQueue } from '@/components/admin/ArtisanQueue'
 import { ProductQueue } from '@/components/admin/ProductQueue'
 import { QueueTabs, type QueueTab } from '@/components/admin/QueueTabs'
 import { useToast } from '@/components/ui/useToast'
-import {
-  getAllArtisans,
-  getCategories,
-  getPendingArtisans,
-  getPendingProducts,
-  setArtisanStatus,
-  setProductStatus,
-} from '@/lib/data'
+// Imported from the Supabase provider directly, NOT through the `@/lib/data`
+// seam, which still points at `mockProvider`. The queue is the one surface that
+// must read and write the shared database — approving here is what makes a
+// listing visible in the mobile app — while the public site keeps serving mock
+// data until real product content exists. memory/decisions.md, 2026-09-12.
+import { supabaseProvider } from '@/lib/data/supabaseProvider'
 import type { Artisan, Product } from '@/lib/data'
 import { useAsyncData } from '@/lib/data/useAsyncData'
 import { useQueue } from '@/lib/admin/useQueue'
@@ -49,10 +47,10 @@ export default function VerificationQueue() {
   // a craft and a maker, so switching tabs costs no second spinner.
   const fetchQueue = useCallback(async () => {
     const [artisans, products, categories, allArtisans] = await Promise.all([
-      getPendingArtisans(),
-      getPendingProducts(),
-      getCategories(),
-      getAllArtisans(),
+      supabaseProvider.getPendingArtisans(),
+      supabaseProvider.getPendingProducts(),
+      supabaseProvider.getCategories(),
+      supabaseProvider.getAllArtisans(),
     ])
     return { artisans, products, categories, allArtisans }
   }, [])
@@ -87,7 +85,7 @@ export default function VerificationQueue() {
    */
   const artisanQueue = useQueue<Artisan>({
     items: data?.artisans ?? [],
-    setStatus: setArtisanStatus,
+    setStatus: supabaseProvider.setArtisanStatus,
     label,
     onApproved,
     onRejected,
@@ -96,7 +94,7 @@ export default function VerificationQueue() {
 
   const productQueue = useQueue<Product>({
     items: data?.products ?? [],
-    setStatus: setProductStatus,
+    setStatus: supabaseProvider.setProductStatus,
     label,
     onApproved,
     onRejected,
