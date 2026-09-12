@@ -1,81 +1,35 @@
-# KalaCart — Website
+# KalaCart
 
-Buyer-facing marketplace plus admin dashboard for an Indian artisan-craft
-platform (SIH26090, Ministry of Social Justice & Empowerment).
+The storefront where buyers discover authentic, verified handmade goods from Indian artisans — and where a ministry reviewer keeps that trust real.
 
-Read `CLAUDE.md` for how to work in this repo and `PRD.md` for what to build.
+## Why we built this
 
-## Run
+Marketplaces make it easy to buy something "handmade," but hard to know if it actually is. Artisans who sell through middlemen lose most of their margin, and buyers who want a real, traceable connection to the maker have no good way to find one.
 
-```bash
-npm install
-npm run dev      # http://localhost:5173
-npm run build    # tsc -b && vite build
-npm run lint     # oxlint
-```
+KalaCart is the demand side of a two-app system: no commission, no middlemen, and every artisan and product on this site has passed a real review before it's visible to anyone.
 
-Node 22.x (pinned in `engines` to match the Vercel build image).
+## Who it's for
 
-## Supabase MCP server
+Built for **buyers** looking for genuine, regionally rooted handmade crafts, and for a **ministry reviewer** who verifies new artisans and listings before they go live. Artisans themselves work from a companion mobile app; this site is where their work reaches the world, once it's been checked.
 
-`.mcp.json` declares the project-scoped Supabase MCP server, so a clone picks it
-up without hand-configuring anything. It carries the server URL only — no key,
-no token, no project ref. Credentials are never stored here: the server
-authorizes over OAuth per person, and the resulting grant lives in your own
-agent settings rather than in the repo.
+Built for Smart India Hackathon 2026, addressing a problem statement from the Ministry of Social Justice & Empowerment on market access for marginalized artisans.
 
-That means **checking this file out does not give you access**. Each person
-authorizes the connector once themselves; until you do, the Supabase tools are
-listed but unusable. Local app credentials are a separate matter and belong in
-`.env.local`, which is gitignored.
+## How it works
 
-## Branches
+This site and the artisan mobile app share one live database. An artisan submits a product from the app; a reviewer approves it here; only then does it appear for buyers to browse, still on this same site. Nothing reaches a buyer without a human checking it first.
 
-This repository holds two unrelated histories:
+## Tech stack
 
-- `main` (default) — this website. Vercel builds and deploys it.
-- `app` — the Android app, FastAPI backend and SQL, pushed from the separate
-  `KalaCartJava` working tree. It shares no commit ancestry with `main`.
+- **React + TypeScript** — the web app
+- **Tailwind CSS** — design system, including light and dark themes
+- **Supabase** — shared database, authentication, and storage
+- **Vercel** — hosting and deployment
 
-Vercel builds `main` only in production. Pushes to `app` produce a failing
-preview build, because that branch carries no `package.json`; the failure is
-expected and does not affect production.
+## Features
 
-## Deploy
-
-Vercel, via the GitHub App integration: a push to `main` triggers a production
-deployment automatically. `vercel --prod` from the project root still works for
-an out-of-band deploy.
-`vercel.json` rewrites paths to `/index.html` so client-side deep links such as
-`/browse` resolve instead of 404ing.
-
-The rewrite excludes the root-level static assets (`favicon.ico`,
-`favicon.svg`, `apple-touch-icon.svg`, `og-image.svg`, `assets/`) through a
-negative lookahead. It used to match `/(.*)` with no exclusions, which meant a
-request for an asset that did not exist was answered with the app shell instead
-of a 404 — and since browsers request `/favicon.ico` by convention whether or
-not it is declared, the browser received an HTML page where it expected an icon
-and kept displaying whichever favicon it had cached previously. Assets must
-404 when missing; only routes fall through.
-
-Note the `$` anchors in the pattern: only exact root-level paths are excluded,
-so `/deep/favicon.ico` still resolves as an SPA route.
-
-## Decisions that diverge from PRD.md
-
-The PRD was written before the scaffold existed. Two stack lines were settled
-differently during Increment 0, both approved:
-
-- **Tailwind v4, not v3.** PRD 7.1 says Tailwind "reads those variables through
-  its config", which is v3 phrasing. v4 has no JS config; theme tokens are
-  declared in CSS. The theme seam is unchanged in substance — raw palette values
-  live as plain custom properties under `:root` and `[data-theme="dark"]`, and
-  `@theme inline` aliases them so utilities emit `var(--token)` and resolve at
-  runtime. The `inline` keyword is load-bearing: without it Tailwind bakes one
-  palette in at build time and the runtime theme swap breaks.
-- **React 19, not 18.** PRD 4 says React 18; `create-vite` now ships 19 and every
-  dependency in the stack supports it.
-
-Also note: the Vite template ships `oxlint` rather than ESLint, and sets no
-`strict` flag anywhere, so `strict` is declared explicitly in
-`tsconfig.app.json` to satisfy CLAUDE.md law 5.
+- 🔍 **Browse & search** — find crafts by category, region, or price
+- 🧵 **Artisan profiles** — see who made what, and where they're from
+- 💬 **Direct contact** — reach an artisan yourself, no middleman, no commission
+- ✅ **Verification queue** — a ministry reviewer approves or rejects every new artisan and listing before it's public
+- 📊 **Program dashboard** — track artisans onboarded, listings live, and reach over time
+- 🌗 **Light & dark themes**
