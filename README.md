@@ -16,6 +16,19 @@ npm run lint     # oxlint
 
 Node 22.x (pinned in `engines` to match the Vercel build image).
 
+## Supabase MCP server
+
+`.mcp.json` declares the project-scoped Supabase MCP server, so a clone picks it
+up without hand-configuring anything. It carries the server URL only — no key,
+no token, no project ref. Credentials are never stored here: the server
+authorizes over OAuth per person, and the resulting grant lives in your own
+agent settings rather than in the repo.
+
+That means **checking this file out does not give you access**. Each person
+authorizes the connector once themselves; until you do, the Supabase tools are
+listed but unusable. Local app credentials are a separate matter and belong in
+`.env.local`, which is gitignored.
+
 ## Branches
 
 This repository holds two unrelated histories:
